@@ -14,6 +14,7 @@
 		904285082808B3E6006D5CB2 /* HologramShaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 904285072808B3E6006D5CB2 /* HologramShaderTests.swift */; };
 		904285122808B3E6006D5CB2 /* HologramShaderUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 904285112808B3E6006D5CB2 /* HologramShaderUITests.swift */; };
 		904285142808B3E6006D5CB2 /* HologramShaderUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 904285132808B3E6006D5CB2 /* HologramShaderUITestsLaunchTests.swift */; };
+		904285212808B90E006D5CB2 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 904285202808B90E006D5CB2 /* Renderer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		9042850D2808B3E6006D5CB2 /* HologramShaderUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HologramShaderUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		904285112808B3E6006D5CB2 /* HologramShaderUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HologramShaderUITests.swift; sourceTree = "<group>"; };
 		904285132808B3E6006D5CB2 /* HologramShaderUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HologramShaderUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		904285202808B90E006D5CB2 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 				904284F92808B3E6006D5CB2 /* Assets.xcassets */,
 				904284FB2808B3E6006D5CB2 /* Main.storyboard */,
 				904284FE2808B3E6006D5CB2 /* HologramShader.entitlements */,
+				904285202808B90E006D5CB2 /* Renderer.swift */,
 			);
 			path = HologramShader;
 			sourceTree = "<group>";
@@ -252,6 +255,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				904284F82808B3E5006D5CB2 /* ViewController.swift in Sources */,
+				904285212808B90E006D5CB2 /* Renderer.swift in Sources */,
 				904284F62808B3E5006D5CB2 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

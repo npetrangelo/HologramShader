@@ -10,6 +10,7 @@ import MetalKit
 
 class ViewController: NSViewController {
     var mtkView: MTKView!
+    var renderer: Renderer!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +26,9 @@ class ViewController: NSViewController {
         print(device.name)
         mtkView.device = device
         mtkView.colorPixelFormat = .bgra8Unorm
+        
+        renderer = Renderer(view: mtkView, device: device)
+        mtkView.delegate = renderer
     }
 
     override var representedObject: Any? {
