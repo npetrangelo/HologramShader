@@ -15,6 +15,7 @@
 		904285122808B3E6006D5CB2 /* HologramShaderUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 904285112808B3E6006D5CB2 /* HologramShaderUITests.swift */; };
 		904285142808B3E6006D5CB2 /* HologramShaderUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 904285132808B3E6006D5CB2 /* HologramShaderUITestsLaunchTests.swift */; };
 		904285212808B90E006D5CB2 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 904285202808B90E006D5CB2 /* Renderer.swift */; };
+		904285232808C247006D5CB2 /* teapot.obj in Resources */ = {isa = PBXBuildFile; fileRef = 904285222808C247006D5CB2 /* teapot.obj */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		904285112808B3E6006D5CB2 /* HologramShaderUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HologramShaderUITests.swift; sourceTree = "<group>"; };
 		904285132808B3E6006D5CB2 /* HologramShaderUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HologramShaderUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		904285202808B90E006D5CB2 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		904285222808C247006D5CB2 /* teapot.obj */ = {isa = PBXFileReference; lastKnownFileType = text; name = teapot.obj; path = HologramShader/teapot.obj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +79,7 @@
 		904284E92808B3E5006D5CB2 = {
 			isa = PBXGroup;
 			children = (
+				904285222808C247006D5CB2 /* teapot.obj */,
 				904284F42808B3E5006D5CB2 /* HologramShader */,
 				904285062808B3E6006D5CB2 /* HologramShaderTests */,
 				904285102808B3E6006D5CB2 /* HologramShaderUITests */,
@@ -228,6 +231,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				904285232808C247006D5CB2 /* teapot.obj in Resources */,
 				904284FA2808B3E6006D5CB2 /* Assets.xcassets in Resources */,
 				904284FD2808B3E6006D5CB2 /* Main.storyboard in Resources */,
 			);
