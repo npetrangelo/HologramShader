@@ -48,7 +48,7 @@
 		904285112808B3E6006D5CB2 /* HologramShaderUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HologramShaderUITests.swift; sourceTree = "<group>"; };
 		904285132808B3E6006D5CB2 /* HologramShaderUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HologramShaderUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		904285202808B90E006D5CB2 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
-		904285222808C247006D5CB2 /* teapot.obj */ = {isa = PBXFileReference; lastKnownFileType = text; name = teapot.obj; path = HologramShader/teapot.obj; sourceTree = "<group>"; };
+		904285222808C247006D5CB2 /* teapot.obj */ = {isa = PBXFileReference; lastKnownFileType = text; path = teapot.obj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,7 +79,6 @@
 		904284E92808B3E5006D5CB2 = {
 			isa = PBXGroup;
 			children = (
-				904285222808C247006D5CB2 /* teapot.obj */,
 				904284F42808B3E5006D5CB2 /* HologramShader */,
 				904285062808B3E6006D5CB2 /* HologramShaderTests */,
 				904285102808B3E6006D5CB2 /* HologramShaderUITests */,
@@ -100,6 +99,7 @@
 		904284F42808B3E5006D5CB2 /* HologramShader */ = {
 			isa = PBXGroup;
 			children = (
+				904285222808C247006D5CB2 /* teapot.obj */,
 				904284F52808B3E5006D5CB2 /* AppDelegate.swift */,
 				904284F72808B3E5006D5CB2 /* ViewController.swift */,
 				904284F92808B3E6006D5CB2 /* Assets.xcassets */,
