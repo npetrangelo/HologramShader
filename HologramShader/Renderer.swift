@@ -15,6 +15,11 @@ struct Uniforms {
     var projectionMatrix: float4x4
 }
 
+struct Lights {
+    var position: SIMD3<Float>
+    var color: SIMD3<Float>
+}
+
 class Renderer: NSObject, MTKViewDelegate {
     let device: MTLDevice
     let mtkView: MTKView
