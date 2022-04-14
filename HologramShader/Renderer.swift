@@ -42,8 +42,8 @@ class Renderer: NSObject, MTKViewDelegate {
         
         time += 1 / Float(mtkView.preferredFramesPerSecond)
         let angle = -time
-        let modelMatrix = float4x4(rotationAbout: float3(0, 1, 0), by: angle) *  float4x4(scaleBy: 2)
-        let viewMatrix = float4x4(translationBy: float3(0, 0, -2))
+        let modelMatrix = float4x4(rotationAbout: SIMD3<Float>(0, 1, 0), by: angle) *  float4x4(scaleBy: 2)
+        let viewMatrix = float4x4(translationBy: SIMD3<Float>(0, 0, -2))
         let aspectRatio = Float(view.drawableSize.width / view.drawableSize.height)
         let projectionMatrix = float4x4(perspectiveProjectionFov: Float.pi / 3, aspectRatio: aspectRatio, nearZ: 0.1, farZ: 100)
         let modelViewMatrix = viewMatrix * modelMatrix
