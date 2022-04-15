@@ -26,6 +26,9 @@ struct Uniforms {
     float4x4 projectionMatrix;
 };
 
+constant float3 ambientIntensity = 0.3;
+constant float3 baseColor(1.0, 0, 0);
+
 vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]], constant Uniforms &uniforms [[buffer(1)]]) {
     VertexOut vertexOut;
     vertexOut.position = uniforms.projectionMatrix * uniforms.modelViewMatrix * float4(vertexIn.position, 1);
@@ -36,6 +39,6 @@ vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]], constant Uniforms &
 }
 
 fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]]) {
-    float3 normal = normalize(fragmentIn.eyeNormal.xyz);
-    return float4(abs(normal), 1);
+    float3 finalColor = ambientIntensity * baseColor;
+    return float4(finalColor, 1);
 }
