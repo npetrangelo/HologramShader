@@ -76,11 +76,7 @@ class Renderer: NSObject, MTKViewDelegate {
     func loadResources() {
         let modelURL = Bundle.main.url(forResource: "teapot", withExtension: "obj")!
         
-        let vertexDescriptor = MDLVertexDescriptor()
-        vertexDescriptor.attributes[0] = MDLVertexAttribute(name: MDLVertexAttributePosition, format: .float3, offset: 0, bufferIndex: 0)
-        vertexDescriptor.attributes[1] = MDLVertexAttribute(name: MDLVertexAttributeNormal, format: .float3, offset: MemoryLayout<Float>.size * 3, bufferIndex: 0)
-        vertexDescriptor.attributes[2] = MDLVertexAttribute(name: MDLVertexAttributeTextureCoordinate, format: .float2, offset: MemoryLayout<Float>.size * 6, bufferIndex: 0)
-        vertexDescriptor.layouts[0] = MDLVertexBufferLayout(stride: MemoryLayout<Float>.size * 8)
+        let vertexDescriptor = Renderer.getMDLVertexDescriptor()
         self.vertexDescriptor = MTKMetalVertexDescriptorFromModelIO(vertexDescriptor)
         
         let bufferAllocator = MTKMeshBufferAllocator(device: device)
@@ -105,7 +101,6 @@ class Renderer: NSObject, MTKViewDelegate {
         pipelineDescriptor.vertexFunction = vertexFunction
         pipelineDescriptor.fragmentFunction = fragmentFunction
         
-        pipelineDescriptor.colorAttachments[0].pixelFormat = mtkView.colorPixelFormat
         pipelineDescriptor.vertexDescriptor = vertexDescriptor
         
         let renderbufferAttachment = pipelineDescriptor.colorAttachments[0]!
@@ -127,5 +122,14 @@ class Renderer: NSObject, MTKViewDelegate {
         } catch {
             fatalError("Could not create render pipeline state object: \(error)")
         }
+    }
+    
+    class func getMDLVertexDescriptor() -> MDLVertexDescriptor {
+        let vertexDescriptor = MDLVertexDescriptor()
+        vertexDescriptor.attributes[0] = MDLVertexAttribute(name: MDLVertexAttributePosition, format: .float3, offset: 0, bufferIndex: 0)
+        vertexDescriptor.attributes[1] = MDLVertexAttribute(name: MDLVertexAttributeNormal, format: .float3, offset: MemoryLayout<Float>.size * 3, bufferIndex: 0)
+        vertexDescriptor.attributes[2] = MDLVertexAttribute(name: MDLVertexAttributeTextureCoordinate, format: .float2, offset: MemoryLayout<Float>.size * 6, bufferIndex: 0)
+        vertexDescriptor.layouts[0] = MDLVertexBufferLayout(stride: MemoryLayout<Float>.size * 8)
+        return vertexDescriptor
     }
 }
