@@ -108,6 +108,20 @@ class Renderer: NSObject, MTKViewDelegate {
         pipelineDescriptor.colorAttachments[0].pixelFormat = mtkView.colorPixelFormat
         pipelineDescriptor.vertexDescriptor = vertexDescriptor
         
+        let renderbufferAttachment = pipelineDescriptor.colorAttachments[0]!
+        
+        // Setup the output pixel format to match the pixel format of the metal kit view
+        renderbufferAttachment.pixelFormat = mtkView.colorPixelFormat
+        
+        // Setup alpha blending
+        renderbufferAttachment.isBlendingEnabled = true
+        renderbufferAttachment.rgbBlendOperation = MTLBlendOperation.add
+        renderbufferAttachment.alphaBlendOperation = MTLBlendOperation.add
+        renderbufferAttachment.sourceRGBBlendFactor = MTLBlendFactor.sourceAlpha
+        renderbufferAttachment.sourceAlphaBlendFactor = MTLBlendFactor.sourceAlpha
+        renderbufferAttachment.destinationRGBBlendFactor = MTLBlendFactor.oneMinusSourceAlpha
+        renderbufferAttachment.destinationAlphaBlendFactor = MTLBlendFactor.oneMinusSourceAlpha
+        
         do {
             renderPipeline = try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
         } catch {
