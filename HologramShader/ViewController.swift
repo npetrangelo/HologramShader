@@ -26,6 +26,7 @@ class ViewController: NSViewController {
         print(device.name)
         mtkView.device = device
         mtkView.colorPixelFormat = .bgra8Unorm
+        mtkView.depthStencilPixelFormat = .depth32Float
         
         renderer = Renderer(view: mtkView, device: device)
         mtkView.delegate = renderer

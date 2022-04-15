@@ -28,11 +28,13 @@ class Renderer: NSObject, MTKViewDelegate {
     var renderPipeline: MTLRenderPipelineState!
     let commandQueue: MTLCommandQueue
     var time: Float = 0
+    let depthStencilState: MTLDepthStencilState
     
     init(view: MTKView, device: MTLDevice) {
         self.mtkView = view
         self.device = device
         self.commandQueue = device.makeCommandQueue()!
+        self.depthStencilState = Renderer.buildDepthStencilState(device: device)
         super.init()
         loadResources()
         buildPipeline()
@@ -57,6 +59,7 @@ class Renderer: NSObject, MTKViewDelegate {
         if let renderPassDescriptor = view.currentRenderPassDescriptor, let drawable = view.currentDrawable {
             let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
             commandEncoder.setRenderPipelineState(renderPipeline)
+            commandEncoder.setDepthStencilState(depthStencilState)
             commandEncoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.size, index: 1)
             for mesh in meshes {
                 let vertexBuffer = mesh.vertexBuffers.first!
@@ -105,6 +108,7 @@ class Renderer: NSObject, MTKViewDelegate {
                 
         // Setup the output pixel format to match the pixel format of the metal kit view
         pipelineDescriptor.colorAttachments[0].pixelFormat = mtkView.colorPixelFormat
+        pipelineDescriptor.depthAttachmentPixelFormat = mtkView.depthStencilPixelFormat
         
         Renderer.configAlphaBlend(pipelineDescriptor: pipelineDescriptor)
         
@@ -113,6 +117,13 @@ class Renderer: NSObject, MTKViewDelegate {
         } catch {
             fatalError("Could not create render pipeline state object: \(error)")
         }
+    }
+    
+    static func buildDepthStencilState(device: MTLDevice) -> MTLDepthStencilState {
+        let depthStencilDescriptor = MTLDepthStencilDescriptor()
+        depthStencilDescriptor.depthCompareFunction = .less
+        depthStencilDescriptor.isDepthWriteEnabled = true
+        return device.makeDepthStencilState(descriptor: depthStencilDescriptor)!
     }
     
     class func getMDLVertexDescriptor() -> MDLVertexDescriptor {
