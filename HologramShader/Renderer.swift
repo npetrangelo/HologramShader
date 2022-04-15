@@ -102,20 +102,11 @@ class Renderer: NSObject, MTKViewDelegate {
         pipelineDescriptor.fragmentFunction = fragmentFunction
         
         pipelineDescriptor.vertexDescriptor = vertexDescriptor
-        
-        let renderbufferAttachment = pipelineDescriptor.colorAttachments[0]!
-        
+                
         // Setup the output pixel format to match the pixel format of the metal kit view
-        renderbufferAttachment.pixelFormat = mtkView.colorPixelFormat
+        pipelineDescriptor.colorAttachments[0].pixelFormat = mtkView.colorPixelFormat
         
-        // Setup alpha blending
-        renderbufferAttachment.isBlendingEnabled = true
-        renderbufferAttachment.rgbBlendOperation = MTLBlendOperation.add
-        renderbufferAttachment.alphaBlendOperation = MTLBlendOperation.add
-        renderbufferAttachment.sourceRGBBlendFactor = MTLBlendFactor.sourceAlpha
-        renderbufferAttachment.sourceAlphaBlendFactor = MTLBlendFactor.sourceAlpha
-        renderbufferAttachment.destinationRGBBlendFactor = MTLBlendFactor.oneMinusSourceAlpha
-        renderbufferAttachment.destinationAlphaBlendFactor = MTLBlendFactor.oneMinusSourceAlpha
+        Renderer.configAlphaBlend(pipelineDescriptor: pipelineDescriptor)
         
         do {
             renderPipeline = try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
@@ -131,5 +122,16 @@ class Renderer: NSObject, MTKViewDelegate {
         vertexDescriptor.attributes[2] = MDLVertexAttribute(name: MDLVertexAttributeTextureCoordinate, format: .float2, offset: MemoryLayout<Float>.size * 6, bufferIndex: 0)
         vertexDescriptor.layouts[0] = MDLVertexBufferLayout(stride: MemoryLayout<Float>.size * 8)
         return vertexDescriptor
+    }
+    
+    class func configAlphaBlend(pipelineDescriptor: MTLRenderPipelineDescriptor) {
+        let renderbufferAttachment = pipelineDescriptor.colorAttachments[0]!
+        renderbufferAttachment.isBlendingEnabled = true
+        renderbufferAttachment.rgbBlendOperation = MTLBlendOperation.add
+        renderbufferAttachment.alphaBlendOperation = MTLBlendOperation.add
+        renderbufferAttachment.sourceRGBBlendFactor = MTLBlendFactor.sourceAlpha
+        renderbufferAttachment.sourceAlphaBlendFactor = MTLBlendFactor.sourceAlpha
+        renderbufferAttachment.destinationRGBBlendFactor = MTLBlendFactor.oneMinusSourceAlpha
+        renderbufferAttachment.destinationAlphaBlendFactor = MTLBlendFactor.oneMinusSourceAlpha
     }
 }
