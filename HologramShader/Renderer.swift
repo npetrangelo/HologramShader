@@ -11,8 +11,9 @@ import ModelIO
 import simd
  
 struct Uniforms {
-    var modelViewMatrix: float4x4
-    var projectionMatrix: float4x4
+    var modelMatrix: float4x4
+    var viewProjectionMatrix: float4x4
+    var normalMatrix: float3x3;
 }
 
 struct Lights {
@@ -53,8 +54,8 @@ class Renderer: NSObject, MTKViewDelegate {
         let viewMatrix = float4x4(translationBy: SIMD3<Float>(0, 0, -2))
         let aspectRatio = Float(view.drawableSize.width / view.drawableSize.height)
         let projectionMatrix = float4x4(perspectiveProjectionFov: Float.pi / 3, aspectRatio: aspectRatio, nearZ: 0.1, farZ: 100)
-        let modelViewMatrix = viewMatrix * modelMatrix
-        var uniforms = Uniforms(modelViewMatrix: modelViewMatrix, projectionMatrix: projectionMatrix)
+        let viewProjectionmatrix = projectionMatrix * viewMatrix
+        var uniforms = Uniforms(modelMatrix: modelMatrix, viewProjectionMatrix: viewProjectionmatrix, normalMatrix: modelMatrix.normalMatrix)
         
         if let renderPassDescriptor = view.currentRenderPassDescriptor, let drawable = view.currentDrawable {
             let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
