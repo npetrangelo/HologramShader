@@ -40,12 +40,18 @@ vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]], constant Uniforms &
 constant float3 ambientIntensity = 0.3;
 constant float3 lightPosition(2, 2, 2); // Light position in world space
 constant float3 lightColor(1, 1, 1);
+constant float3 worldCameraPosition(0, 0, 2);
 constant float3 baseColor(1.0, 0, 0);
+constant float specularPower = 200;
 
 fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]]) {
     float3 N = normalize(fragmentIn.worldNormal);
     float3 L = normalize(lightPosition - fragmentIn.worldPosition);
     float3 diffuseIntensity = saturate(dot(N, L));
-    float3 finalColor = saturate(ambientIntensity + diffuseIntensity) * lightColor * baseColor;
+    float3 V = normalize(worldCameraPosition - fragmentIn.worldPosition);
+    float3 H = normalize(L + V);
+    float specularBase = saturate(dot(N, H));
+    float specularIntensity = powr(specularBase, specularPower);
+    float3 finalColor = saturate(ambientIntensity + diffuseIntensity) * baseColor * lightColor + specularIntensity * lightColor;
     return float4(finalColor, 1);
 }
