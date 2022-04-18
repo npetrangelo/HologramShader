@@ -30,12 +30,15 @@ class Renderer: NSObject, MTKViewDelegate {
     let commandQueue: MTLCommandQueue
     var time: Float = 0
     let depthStencilState: MTLDepthStencilState
+    var baseColorTexture: MTLTexture?
+    let samplerState: MTLSamplerState
     
     init(view: MTKView, device: MTLDevice) {
         self.mtkView = view
         self.device = device
         self.commandQueue = device.makeCommandQueue()!
         self.depthStencilState = Renderer.buildDepthStencilState(device: device)
+        self.samplerState = Renderer.buildSamplerState(device: device)
         super.init()
         loadResources()
         buildPipeline()
@@ -61,6 +64,8 @@ class Renderer: NSObject, MTKViewDelegate {
             let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
             commandEncoder.setRenderPipelineState(renderPipeline)
             commandEncoder.setDepthStencilState(depthStencilState)
+            commandEncoder.setFragmentTexture(baseColorTexture, index: 0)
+            commandEncoder.setFragmentSamplerState(samplerState, index: 0)
             commandEncoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.size, index: 1)
             for mesh in meshes {
                 let vertexBuffer = mesh.vertexBuffers.first!
@@ -91,6 +96,11 @@ class Renderer: NSObject, MTKViewDelegate {
         } catch {
             fatalError("Could not extract meshes from Model I/O asset")
         }
+        
+        let textureLoader = MTKTextureLoader(device: device)
+        let options: [MTKTextureLoader.Option: Any] = [.generateMipmaps: true, .SRGB: true]
+        baseColorTexture = try? textureLoader.newTexture(name: "tiles_baseColor", scaleFactor: 1.0, bundle: nil, options: options)
+        
     }
     
     func buildPipeline() {
@@ -125,6 +135,15 @@ class Renderer: NSObject, MTKViewDelegate {
         depthStencilDescriptor.depthCompareFunction = .less
         depthStencilDescriptor.isDepthWriteEnabled = true
         return device.makeDepthStencilState(descriptor: depthStencilDescriptor)!
+    }
+    
+    static func buildSamplerState(device: MTLDevice) -> MTLSamplerState {
+        let samplerDescriptor = MTLSamplerDescriptor()
+        samplerDescriptor.normalizedCoordinates = true
+        samplerDescriptor.minFilter = .linear
+        samplerDescriptor.magFilter = .linear
+        samplerDescriptor.mipFilter = .linear
+        return device.makeSamplerState(descriptor: samplerDescriptor)!
     }
     
     class func getMDLVertexDescriptor() -> MDLVertexDescriptor {
