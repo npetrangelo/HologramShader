@@ -10,15 +10,10 @@ import MetalKit
 import ModelIO
 import simd
  
-struct Uniforms {
+struct VertexUniforms {
     var modelMatrix: float4x4
     var viewProjectionMatrix: float4x4
     var normalMatrix: float3x3;
-}
-
-struct Lights {
-    var position: SIMD3<Float>
-    var color: SIMD3<Float>
 }
 
 class Renderer: NSObject, MTKViewDelegate {
@@ -54,11 +49,20 @@ class Renderer: NSObject, MTKViewDelegate {
         time += 1 / Float(mtkView.preferredFramesPerSecond)
         let angle = -time
         let modelMatrix = float4x4(rotationAbout: SIMD3<Float>(0, 1, 0), by: angle) *  float4x4(scaleBy: 2)
-        let viewMatrix = float4x4(translationBy: SIMD3<Float>(0, 0, -2))
+        let cameraWorldPosition = SIMD3<Float>(0, 0, 2)
+        let viewMatrix = float4x4(translationBy: -cameraWorldPosition)
         let aspectRatio = Float(view.drawableSize.width / view.drawableSize.height)
         let projectionMatrix = float4x4(perspectiveProjectionFov: Float.pi / 3, aspectRatio: aspectRatio, nearZ: 0.1, farZ: 100)
         let viewProjectionmatrix = projectionMatrix * viewMatrix
-        var uniforms = Uniforms(modelMatrix: modelMatrix, viewProjectionMatrix: viewProjectionmatrix, normalMatrix: modelMatrix.normalMatrix)
+        var vertexUniforms = VertexUniforms(modelMatrix: modelMatrix, viewProjectionMatrix: viewProjectionmatrix, normalMatrix: modelMatrix.normalMatrix)
+        
+        let material = Material()
+        material.specularPower = 200
+        material.specularColor = SIMD3<Float>(0.8, 0.8, 0.8)
+        let light0 = Light(worldPosition: SIMD3<Float>(2,  2, 2), color: SIMD3<Float>(1, 0, 0))
+        let light1 = Light(worldPosition: SIMD3<Float>(-2, 2, 2), color: SIMD3<Float>(0, 1, 0))
+        let light2 = Light(worldPosition: SIMD3<Float>(0, -2, 2), color: SIMD3<Float>(0, 0, 1))
+        var fragmentUniforms = FragmentUniforms(cameraWorldPosition: cameraWorldPosition, ambientLightColor: SIMD3<Float>(0.1, 0.1, 0.1), specularColor: material.specularColor, specularPower: material.specularPower, light0: light0, light1: light1, light2: light2)
         
         if let renderPassDescriptor = view.currentRenderPassDescriptor, let drawable = view.currentDrawable {
             let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
@@ -66,7 +70,8 @@ class Renderer: NSObject, MTKViewDelegate {
             commandEncoder.setDepthStencilState(depthStencilState)
             commandEncoder.setFragmentTexture(baseColorTexture, index: 0)
             commandEncoder.setFragmentSamplerState(samplerState, index: 0)
-            commandEncoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.size, index: 1)
+            commandEncoder.setVertexBytes(&vertexUniforms, length: MemoryLayout<VertexUniforms>.size, index: 1)
+            commandEncoder.setFragmentBytes(&fragmentUniforms, length: MemoryLayout<FragmentUniforms>.size, index: 0)
             for mesh in meshes {
                 let vertexBuffer = mesh.vertexBuffers.first!
                 commandEncoder.setVertexBuffer(vertexBuffer.buffer, offset: vertexBuffer.offset, index: 0)
