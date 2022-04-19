@@ -16,10 +16,19 @@ struct VertexUniforms {
     var normalMatrix: float3x3;
 }
 
+struct FragmentUniforms {
+    var cameraWorldPosition = SIMD3<Float>(0, 0, 0)
+    var ambientLightColor = SIMD3<Float>(0, 0, 0)
+    var specularColor = SIMD3<Float>(1, 1, 1)
+    var specularPower = Float(1)
+    var light0 = Light()
+    var light1 = Light()
+    var light2 = Light()
+}
+
 class Renderer: NSObject, MTKViewDelegate {
     let device: MTLDevice
-    let mtkView: MTKView
-    var vertexDescriptor: MTLVertexDescriptor!
+    var vertexDescriptor: MDLVertexDescriptor
     var meshes: [MTKMesh] = []
     var renderPipeline: MTLRenderPipelineState!
     let commandQueue: MTLCommandQueue
@@ -27,16 +36,17 @@ class Renderer: NSObject, MTKViewDelegate {
     let depthStencilState: MTLDepthStencilState
     var baseColorTexture: MTLTexture?
     let samplerState: MTLSamplerState
+    let scene: Scene
     
     init(view: MTKView, device: MTLDevice) {
-        self.mtkView = view
         self.device = device
-        self.commandQueue = device.makeCommandQueue()!
-        self.depthStencilState = Renderer.buildDepthStencilState(device: device)
-        self.samplerState = Renderer.buildSamplerState(device: device)
+        commandQueue = device.makeCommandQueue()!
+        depthStencilState = Renderer.buildDepthStencilState(device: device)
+        samplerState = Renderer.buildSamplerState(device: device)
+        vertexDescriptor = Renderer.getMDLVertexDescriptor()
+        renderPipeline = Renderer.buildPipeline(device: device, view: view, vertexDescriptor: vertexDescriptor)
+        scene = Renderer.buildScene(device: device, vertexDescriptor: Renderer.getMDLVertexDescriptor())
         super.init()
-        loadResources()
-        buildPipeline()
     }
     
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
@@ -46,7 +56,7 @@ class Renderer: NSObject, MTKViewDelegate {
     func draw(in view: MTKView) {
         let commandBuffer = commandQueue.makeCommandBuffer()!
         
-        time += 1 / Float(mtkView.preferredFramesPerSecond)
+        time += 1 / Float(view.preferredFramesPerSecond)
         let angle = -time
         let modelMatrix = float4x4(rotationAbout: SIMD3<Float>(0, 1, 0), by: angle) *  float4x4(scaleBy: 2)
         let cameraWorldPosition = SIMD3<Float>(0, 0, 2)
@@ -87,14 +97,23 @@ class Renderer: NSObject, MTKViewDelegate {
         }
     }
     
-    func loadResources() {
-        let modelURL = Bundle.main.url(forResource: "teapot", withExtension: "obj")!
-        
-        let vertexDescriptor = Renderer.getMDLVertexDescriptor()
-        self.vertexDescriptor = MTKMetalVertexDescriptorFromModelIO(vertexDescriptor)
-        
+    static func buildScene(device: MTLDevice, vertexDescriptor: MDLVertexDescriptor) -> Scene {
         let bufferAllocator = MTKMeshBufferAllocator(device: device)
+        let textureLoader = MTKTextureLoader(device: device)
+        let options: [MTKTextureLoader.Option: Any] = [.generateMipmaps: true, .SRGB: true]
         
+        let scene = Scene()
+        
+        scene.ambientLightColor = SIMD3<Float>(0.01, 0.01, 0.01)
+        let light0 = Light(worldPosition: SIMD3<Float>(2,  2, 2), color: SIMD3<Float>(1, 0, 0))
+        let light1 = Light(worldPosition: SIMD3<Float>(-2, 2, 2), color: SIMD3<Float>(0, 1, 0))
+        let light2 = Light(worldPosition: SIMD3<Float>(0, -2, 2), color: SIMD3<Float>(0, 0, 1))
+        scene.lights = [ light0, light1, light2 ]
+        
+        let teapot = Node(name: "Teapot")
+
+        let modelURL = Bundle.main.url(forResource: "teapot", withExtension: "obj")!
+                        
         let asset = MDLAsset(url: modelURL, vertexDescriptor: vertexDescriptor, bufferAllocator: bufferAllocator)
         do {
             (_, meshes) = try MTKMesh.newMeshes(asset: asset, device: device)
@@ -102,13 +121,11 @@ class Renderer: NSObject, MTKViewDelegate {
             fatalError("Could not extract meshes from Model I/O asset")
         }
         
-        let textureLoader = MTKTextureLoader(device: device)
-        let options: [MTKTextureLoader.Option: Any] = [.generateMipmaps: true, .SRGB: true]
         baseColorTexture = try? textureLoader.newTexture(name: "tiles_baseColor", scaleFactor: 1.0, bundle: nil, options: options)
         
     }
     
-    func buildPipeline() {
+    static func buildPipeline(device: MTLDevice, view: MTKView, vertexDescriptor: MDLVertexDescriptor) -> MTLRenderPipelineState {
         guard let library = device.makeDefaultLibrary() else {
             fatalError("Could not load default library from main bundle")
         }
@@ -120,7 +137,8 @@ class Renderer: NSObject, MTKViewDelegate {
         pipelineDescriptor.vertexFunction = vertexFunction
         pipelineDescriptor.fragmentFunction = fragmentFunction
         
-        pipelineDescriptor.vertexDescriptor = vertexDescriptor
+        let mtlVertexDescriptor = MTKMetalVertexDescriptorFromModelIO(vertexDescriptor)
+        pipelineDescriptor.vertexDescriptor = mtlVertexDescriptor
                 
         // Setup the output pixel format to match the pixel format of the metal kit view
         pipelineDescriptor.colorAttachments[0].pixelFormat = mtkView.colorPixelFormat
@@ -129,7 +147,7 @@ class Renderer: NSObject, MTKViewDelegate {
         Renderer.configAlphaBlend(pipelineDescriptor: pipelineDescriptor)
         
         do {
-            renderPipeline = try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+            return try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
         } catch {
             fatalError("Could not create render pipeline state object: \(error)")
         }
