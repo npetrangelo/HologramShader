@@ -60,8 +60,9 @@ class Renderer: NSObject, MTKViewDelegate {
         scene.lights = [ light0, light1, light2 ]
         
         let teapot = Node.makeTeapot(device: device, vertexDescriptor: vertexDescriptor)
+        let plane = Node.makePlane(device: device)
         let cube = Node.makeCube(device: device)
-        scene.rootNode.children.append(cube)
+        scene.rootNode.children.append(plane)
         
         return scene
     }

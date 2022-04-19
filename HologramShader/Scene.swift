@@ -31,6 +31,21 @@ class Node {
         self.name = name
     }
     
+    static func makePlane(device: MTLDevice) -> Node {
+        let bufferAllocator = MTKMeshBufferAllocator(device: device)
+        let textureLoader = MTKTextureLoader(device: device)
+        let options: [MTKTextureLoader.Option : Any] = [.generateMipmaps : true, .SRGB : true]
+        
+        let plane = Node(name: "Plane")
+        let mesh = MDLMesh.newPlane(withDimensions: [0.5, 0.5], segments: [5, 5], geometryType: .triangles, allocator: bufferAllocator)
+        plane.mesh = try? MTKMesh.init(mesh: mesh, device: device)
+        plane.material.baseColorTexture = try? textureLoader.newTexture(name: "tiles_baseColor", scaleFactor: 1.0, bundle: nil, options: options)
+        plane.material.specularPower = 200
+        plane.material.specularColor = SIMD3<Float>(0.8, 0.8, 0.8)
+        plane.modelMatrix.rotateAbout(axis: SIMD3<Float>(1,0,0), angleRadians: Float.pi/2)
+        return plane
+    }
+    
     static func makeCube(device: MTLDevice) -> Node {
         let bufferAllocator = MTKMeshBufferAllocator(device: device)
         let textureLoader = MTKTextureLoader(device: device)
