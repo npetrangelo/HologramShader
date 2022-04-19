@@ -66,7 +66,7 @@ class Renderer: NSObject, MTKViewDelegate {
         let teapot = Node(name: "Teapot")
 
         let modelURL = Bundle.main.url(forResource: "teapot", withExtension: "obj")!
-        let asset = MDLAsset(url: modelURL, vertexDescriptor: vertexDescriptor, bufferAllocator: bufferAllocator)
+        let asset = MDLAsset(url: modelURL, vertexDescriptor: nil, bufferAllocator: bufferAllocator)
         teapot.mesh = try! MTKMesh.newMeshes(asset: asset, device: device).metalKitMeshes.first
         teapot.material.baseColorTexture = try? textureLoader.newTexture(name: "tiles_baseColor", scaleFactor: 1.0, bundle: nil, options: options)
         teapot.material.specularPower = 200
