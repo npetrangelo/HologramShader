@@ -59,6 +59,18 @@ extension float4x4 {
                   SIMD4<Float>( 0,  0, wz,  0))
     }
     
+    mutating func scaleBy(s: Float) {
+        self *= float4x4.init(scaleBy: s)
+    }
+    
+    mutating func translateBy(t: SIMD3<Float>) {
+        self *= float4x4.init(translationBy: t)
+    }
+    
+    mutating func rotateAbout(axis: SIMD3<Float>, angleRadians: Float) {
+        self *= float4x4.init(rotationAbout: axis, by: angleRadians)
+    }
+    
     var normalMatrix: float3x3 {
         let upperLeft = float3x3(self[0].xyz, self[1].xyz, self[2].xyz)
         return upperLeft.transpose.inverse
