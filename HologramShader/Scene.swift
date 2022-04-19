@@ -31,6 +31,20 @@ class Node {
         self.name = name
     }
     
+    static func makeCube(device: MTLDevice) -> Node {
+        let bufferAllocator = MTKMeshBufferAllocator(device: device)
+        let textureLoader = MTKTextureLoader(device: device)
+        let options: [MTKTextureLoader.Option : Any] = [.generateMipmaps : true, .SRGB : true]
+        
+        let cube = Node(name: "Cube")
+        let mesh = MDLMesh.newBox(withDimensions: [0.5, 0.5, 0.5], segments: [5, 5, 5], geometryType: .triangles, inwardNormals: false, allocator: bufferAllocator)
+        cube.mesh = try? MTKMesh.init(mesh: mesh, device: device)
+        cube.material.baseColorTexture = try? textureLoader.newTexture(name: "tiles_baseColor", scaleFactor: 1.0, bundle: nil, options: options)
+        cube.material.specularPower = 200
+        cube.material.specularColor = SIMD3<Float>(0.8, 0.8, 0.8)
+        return cube
+    }
+    
     static func makeTeapot(device: MTLDevice, vertexDescriptor: MDLVertexDescriptor) -> Node {
         let bufferAllocator = MTKMeshBufferAllocator(device: device)
         let textureLoader = MTKTextureLoader(device: device)
