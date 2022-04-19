@@ -61,6 +61,7 @@ class Renderer: NSObject, MTKViewDelegate {
         
         let teapot = Node.makeTeapot(device: device, vertexDescriptor: vertexDescriptor)
         let plane = Node.makePlane(device: device)
+        plane.modelMatrix.rotateAbout(axis: SIMD3<Float>(1,0,0), angleRadians: Float.pi/2)
         let cube = Node.makeCube(device: device)
         scene.rootNode.children.append(plane)
         

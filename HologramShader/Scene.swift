@@ -42,7 +42,6 @@ class Node {
         plane.material.baseColorTexture = try? textureLoader.newTexture(name: "tiles_baseColor", scaleFactor: 1.0, bundle: nil, options: options)
         plane.material.specularPower = 200
         plane.material.specularColor = SIMD3<Float>(0.8, 0.8, 0.8)
-        plane.modelMatrix.rotateAbout(axis: SIMD3<Float>(1,0,0), angleRadians: Float.pi/2)
         return plane
     }
     
