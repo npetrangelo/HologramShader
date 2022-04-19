@@ -54,15 +54,15 @@ class Renderer: NSObject, MTKViewDelegate {
         let scene = Scene()
         
         scene.ambientLightColor = SIMD3<Float>(0.01, 0.01, 0.01)
-        let light0 = Light(worldPosition: SIMD3<Float>( 2,  2, 2), color: SIMD3<Float>(1, 0, 0))
-        let light1 = Light(worldPosition: SIMD3<Float>(-2,  2, 2), color: SIMD3<Float>(0, 1, 0))
+        let light0 = Light(worldPosition: SIMD3<Float>( 0.5,  0, 0), color: SIMD3<Float>(1, 0, 0))
+        let light1 = Light(worldPosition: SIMD3<Float>(-0.5,  0, 0), color: SIMD3<Float>(0, 1, 0))
         let light2 = Light(worldPosition: SIMD3<Float>( 0, -2, 2), color: SIMD3<Float>(0, 0, 1))
         scene.lights = [ light0, light1, light2 ]
         
-        let teapot = Node.makeTeapot(device: device, vertexDescriptor: vertexDescriptor)
         let plane = Node.makePlane(device: device)
+        plane.modelMatrix.scaleBy(s: 2)
         plane.modelMatrix.rotateAbout(axis: SIMD3<Float>(1,0,0), angleRadians: Float.pi/2)
-        let cube = Node.makeCube(device: device)
+//        let teapot = Node.makeTeapot(device: device, vertexDescriptor: vertexDescriptor)
         scene.rootNode.children.append(plane)
         
         return scene
@@ -108,7 +108,7 @@ class Renderer: NSObject, MTKViewDelegate {
         }
         
         let vertexFunction = library.makeFunction(name: "vertex_main")
-        let fragmentFunction = library.makeFunction(name: "fragment_main")
+        let fragmentFunction = library.makeFunction(name: "fragment_hologram")
         
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
         pipelineDescriptor.vertexFunction = vertexFunction
@@ -148,7 +148,7 @@ class Renderer: NSObject, MTKViewDelegate {
         let aspectRatio = Float(view.drawableSize.width / view.drawableSize.height)
         projectionMatrix = float4x4(perspectiveProjectionFov: Float.pi / 3, aspectRatio: aspectRatio, nearZ: 0.1, farZ: 100)
         
-        let angle = -time
+        let angle = -time / 2
         scene.rootNode.modelMatrix = float4x4(rotationAbout: SIMD3<Float>(0, 1, 0), by: angle) *  float4x4(scaleBy: 1.5)
     }
     

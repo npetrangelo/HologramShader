@@ -77,3 +77,17 @@ fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
     }
     return float4(finalColor, 1);
 }
+
+fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
+                                  constant FragmentUniforms &uniforms [[buffer(0)]],
+                                  texture2d<float, access::sample> baseColorTexture [[texture(0)]],
+                                  sampler baseColorSampler [[sampler(0)]]) {
+    float wavelength = 0.02;
+    float3 finalColor = float3(0, 0, 0);
+    for (int i = 0; i < 2; i++) {
+        float distance = length(fragmentIn.worldPosition - uniforms.lights[i].worldPosition)/wavelength;
+        finalColor += (float3(cos(distance), sin(distance), 0) + float3(1, 1, 0))/2;
+    }
+    
+    return float4(finalColor, 1);
+}
