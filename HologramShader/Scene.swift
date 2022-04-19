@@ -30,6 +30,22 @@ class Node {
     init(name: String) {
         self.name = name
     }
+    
+    static func makeTeapot(device: MTLDevice, vertexDescriptor: MDLVertexDescriptor) -> Node {
+        let bufferAllocator = MTKMeshBufferAllocator(device: device)
+        let textureLoader = MTKTextureLoader(device: device)
+        let options: [MTKTextureLoader.Option : Any] = [.generateMipmaps : true, .SRGB : true]
+
+        let teapot = Node(name: "Teapot")
+
+        let modelURL = Bundle.main.url(forResource: "teapot", withExtension: "obj")!
+        let asset = MDLAsset(url: modelURL, vertexDescriptor: vertexDescriptor, bufferAllocator: bufferAllocator)
+        teapot.mesh = try! MTKMesh.newMeshes(asset: asset, device: device).metalKitMeshes.first
+        teapot.material.baseColorTexture = try? textureLoader.newTexture(name: "tiles_baseColor", scaleFactor: 1.0, bundle: nil, options: options)
+        teapot.material.specularPower = 200
+        teapot.material.specularColor = SIMD3<Float>(0.8, 0.8, 0.8)
+        return teapot
+    }
 }
 
 class Scene {

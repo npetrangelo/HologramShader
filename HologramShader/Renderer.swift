@@ -31,7 +31,6 @@ class Renderer: NSObject, MTKViewDelegate {
     var renderPipeline: MTLRenderPipelineState
     let depthStencilState: MTLDepthStencilState
     let samplerState: MTLSamplerState
-    let vertexDescriptor: MDLVertexDescriptor
     let scene: Scene
     
     var time: Float = 0
@@ -42,19 +41,16 @@ class Renderer: NSObject, MTKViewDelegate {
     init(view: MTKView, device: MTLDevice) {
         self.device = device
         commandQueue = device.makeCommandQueue()!
-        vertexDescriptor = Renderer.buildVertexDescriptor()
-        renderPipeline = Renderer.buildPipeline(device: device, view: view, vertexDescriptor: vertexDescriptor)
         samplerState = Renderer.buildSamplerState(device: device)
         depthStencilState = Renderer.buildDepthStencilState(device: device)
+        
+        let vertexDescriptor = Renderer.buildVertexDescriptor()
+        renderPipeline = Renderer.buildPipeline(device: device, view: view, vertexDescriptor: vertexDescriptor)
         scene = Renderer.buildScene(device: device, vertexDescriptor: vertexDescriptor)
         super.init()
     }
     
     static func buildScene(device: MTLDevice, vertexDescriptor: MDLVertexDescriptor) -> Scene {
-        let bufferAllocator = MTKMeshBufferAllocator(device: device)
-        let textureLoader = MTKTextureLoader(device: device)
-        let options: [MTKTextureLoader.Option : Any] = [.generateMipmaps : true, .SRGB : true]
-        
         let scene = Scene()
         
         scene.ambientLightColor = SIMD3<Float>(0.01, 0.01, 0.01)
@@ -63,14 +59,7 @@ class Renderer: NSObject, MTKViewDelegate {
         let light2 = Light(worldPosition: SIMD3<Float>( 0, -2, 2), color: SIMD3<Float>(0, 0, 1))
         scene.lights = [ light0, light1, light2 ]
         
-        let teapot = Node(name: "Teapot")
-
-        let modelURL = Bundle.main.url(forResource: "teapot", withExtension: "obj")!
-        let asset = MDLAsset(url: modelURL, vertexDescriptor: nil, bufferAllocator: bufferAllocator)
-        teapot.mesh = try! MTKMesh.newMeshes(asset: asset, device: device).metalKitMeshes.first
-        teapot.material.baseColorTexture = try? textureLoader.newTexture(name: "tiles_baseColor", scaleFactor: 1.0, bundle: nil, options: options)
-        teapot.material.specularPower = 200
-        teapot.material.specularColor = SIMD3<Float>(0.8, 0.8, 0.8)
+        let teapot = Node.makeTeapot(device: device, vertexDescriptor: vertexDescriptor)
         scene.rootNode.children.append(teapot)
         
         return scene
