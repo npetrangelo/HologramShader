@@ -39,6 +39,7 @@ struct FragmentUniforms {
     float3 ambientLightColor;
     float3 specularColor;
     float specularPower;
+    int numLights;
 };
 
 vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]],
@@ -83,12 +84,11 @@ fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
                                   texture2d<float, access::sample> baseColorTexture [[texture(0)]],
                                   sampler baseColorSampler [[sampler(0)]],
                                   constant Light* lights [[buffer(1)]]) {
-    float numLights = 3;
     float frequency = 300;
     float3 finalColor = float3(0, 0, 0);
-    for (int i = 0; i < numLights; i++) {
+    for (int i = 0; i < uniforms.numLights; i++) {
         float distance = length(fragmentIn.worldPosition - lights[i].worldPosition) * frequency;
-        finalColor += (float3(cos(distance), sin(distance), 0) + float3(1, 1, 0))/numLights;
+        finalColor += (float3(cos(distance), sin(distance), 0) + float3(1, 1, 0))/uniforms.numLights;
     }
     
     return float4(finalColor/2, 1);

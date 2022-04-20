@@ -20,6 +20,7 @@ struct FragmentUniforms {
     var ambientLightColor = SIMD3<Float>(0, 0, 0)
     var specularColor = SIMD3<Float>(1, 1, 1)
     var specularPower = Float(1)
+    var numLights = Int(1)
 }
 
 class Renderer: NSObject, MTKViewDelegate {
@@ -185,7 +186,8 @@ class Renderer: NSObject, MTKViewDelegate {
             var fragmentUniforms = FragmentUniforms(cameraWorldPosition: cameraWorldPosition,
                                                     ambientLightColor: scene.ambientLightColor,
                                                     specularColor: node.material.specularColor,
-                                                    specularPower: node.material.specularPower)
+                                                    specularPower: node.material.specularPower,
+                                                    numLights: scene.lights.count)
             commandEncoder.setFragmentBytes(&fragmentUniforms, length: MemoryLayout<FragmentUniforms>.size, index: 0)
             commandEncoder.setFragmentTexture(baseColorTexture, index: 0)
 
