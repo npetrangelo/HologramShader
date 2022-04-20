@@ -20,9 +20,6 @@ struct FragmentUniforms {
     var ambientLightColor = SIMD3<Float>(0, 0, 0)
     var specularColor = SIMD3<Float>(1, 1, 1)
     var specularPower = Float(1)
-    var light0 = Light()
-    var light1 = Light()
-    var light2 = Light()
 }
 
 class Renderer: NSObject, MTKViewDelegate {
@@ -56,7 +53,7 @@ class Renderer: NSObject, MTKViewDelegate {
         scene.ambientLightColor = SIMD3<Float>(0.01, 0.01, 0.01)
         let light0 = Light(worldPosition: SIMD3<Float>( 0.5,  0, 2), color: SIMD3<Float>(1, 0, 0))
         let light1 = Light(worldPosition: SIMD3<Float>(-0.5,  0, 2), color: SIMD3<Float>(0, 1, 0))
-        let light2 = Light(worldPosition: SIMD3<Float>( 0, -2, 2), color: SIMD3<Float>(0, 0, 1))
+        let light2 = Light(worldPosition: SIMD3<Float>( 0, -0.5, 2), color: SIMD3<Float>(0, 0, 1))
         scene.lights = [ light0, light1, light2 ]
         
         let plane = Node.makePlane(device: device)
@@ -64,7 +61,6 @@ class Renderer: NSObject, MTKViewDelegate {
         plane.modelMatrix.rotateAbout(axis: SIMD3<Float>(1,0,0), angleRadians: Float.pi/2)
 //        let teapot = Node.makeTeapot(device: device, vertexDescriptor: vertexDescriptor)
         scene.rootNode.children.append(plane)
-        
         return scene
     }
     
@@ -159,12 +155,16 @@ class Renderer: NSObject, MTKViewDelegate {
     func draw(in view: MTKView) {
         update(view)
         
+        let lightSize = scene.lights.count * MemoryLayout<Light>.size
+        let lightBuffer = device.makeBuffer(bytes: scene.lights, length: lightSize, options: [])
+        
         let commandBuffer = commandQueue.makeCommandBuffer()!
         if let renderPassDescriptor = view.currentRenderPassDescriptor, let drawable = view.currentDrawable {
             let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
             commandEncoder.setDepthStencilState(depthStencilState)
             commandEncoder.setRenderPipelineState(renderPipeline)
             commandEncoder.setFragmentSamplerState(samplerState, index: 0)
+            commandEncoder.setFragmentBuffer(lightBuffer, offset: 0, index: 1)
             drawNodeRecursive(scene.rootNode, parentTransform: matrix_identity_float4x4, commandEncoder: commandEncoder)
             commandEncoder.endEncoding()
             commandBuffer.present(drawable)
@@ -185,12 +185,8 @@ class Renderer: NSObject, MTKViewDelegate {
             var fragmentUniforms = FragmentUniforms(cameraWorldPosition: cameraWorldPosition,
                                                     ambientLightColor: scene.ambientLightColor,
                                                     specularColor: node.material.specularColor,
-                                                    specularPower: node.material.specularPower,
-                                                    light0: scene.lights[0],
-                                                    light1: scene.lights[1],
-                                                    light2: scene.lights[2])
+                                                    specularPower: node.material.specularPower)
             commandEncoder.setFragmentBytes(&fragmentUniforms, length: MemoryLayout<FragmentUniforms>.size, index: 0)
-
             commandEncoder.setFragmentTexture(baseColorTexture, index: 0)
 
             let vertexBuffer = mesh.vertexBuffers.first!

@@ -39,7 +39,6 @@ struct FragmentUniforms {
     float3 ambientLightColor;
     float3 specularColor;
     float specularPower;
-    Light lights[LightCount];
 };
 
 vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]],
@@ -56,7 +55,8 @@ vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]],
 fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
                               constant FragmentUniforms &uniforms [[buffer(0)]],
                               texture2d<float, access::sample> baseColorTexture [[texture(0)]],
-                              sampler baseColorSampler [[sampler(0)]]) {
+                              sampler baseColorSampler [[sampler(0)]],
+                              constant Light* lights [[buffer(1)]]) {
     float3 baseColor = baseColorTexture.sample(baseColorSampler, fragmentIn.texCoords).rgb;
     float3 specularColor = uniforms.specularColor;
     
@@ -65,12 +65,12 @@ fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
 
     float3 finalColor(0, 0, 0);
     for (int i = 0; i < LightCount; ++i) {
-        float3 L = normalize(uniforms.lights[i].worldPosition - fragmentIn.worldPosition.xyz);
+        float3 L = normalize(lights[i].worldPosition - fragmentIn.worldPosition.xyz);
         float3 diffuseIntensity = saturate(dot(N, L));
         float3 H = normalize(L + V);
         float specularBase = saturate(dot(N, H));
         float specularIntensity = powr(specularBase, uniforms.specularPower);
-        float3 lightColor = uniforms.lights[i].color;
+        float3 lightColor = lights[i].color;
         finalColor += uniforms.ambientLightColor * baseColor +
                       diffuseIntensity * lightColor * baseColor +
                       specularIntensity * lightColor * specularColor;
@@ -81,12 +81,13 @@ fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
 fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
                                   constant FragmentUniforms &uniforms [[buffer(0)]],
                                   texture2d<float, access::sample> baseColorTexture [[texture(0)]],
-                                  sampler baseColorSampler [[sampler(0)]]) {
-    float numLights = 2;
+                                  sampler baseColorSampler [[sampler(0)]],
+                                  constant Light* lights [[buffer(1)]]) {
+    float numLights = 3;
     float frequency = 300;
     float3 finalColor = float3(0, 0, 0);
     for (int i = 0; i < numLights; i++) {
-        float distance = length(fragmentIn.worldPosition - uniforms.lights[i].worldPosition) * frequency;
+        float distance = length(fragmentIn.worldPosition - lights[i].worldPosition) * frequency;
         finalColor += (float3(cos(distance), sin(distance), 0) + float3(1, 1, 0))/numLights;
     }
     
