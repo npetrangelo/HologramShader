@@ -83,10 +83,10 @@ fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
                                   texture2d<float, access::sample> baseColorTexture [[texture(0)]],
                                   sampler baseColorSampler [[sampler(0)]]) {
     float numLights = 2;
-    float wavelength = 0.02;
+    float frequency = 300;
     float3 finalColor = float3(0, 0, 0);
     for (int i = 0; i < numLights; i++) {
-        float distance = length(fragmentIn.worldPosition - uniforms.lights[i].worldPosition)/wavelength;
+        float distance = length(fragmentIn.worldPosition - uniforms.lights[i].worldPosition) * frequency;
         finalColor += (float3(cos(distance), sin(distance), 0) + float3(1, 1, 0))/numLights;
     }
     
