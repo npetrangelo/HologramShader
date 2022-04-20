@@ -54,8 +54,8 @@ class Renderer: NSObject, MTKViewDelegate {
         let scene = Scene()
         
         scene.ambientLightColor = SIMD3<Float>(0.01, 0.01, 0.01)
-        let light0 = Light(worldPosition: SIMD3<Float>( 0.5,  0, 0), color: SIMD3<Float>(1, 0, 0))
-        let light1 = Light(worldPosition: SIMD3<Float>(-0.5,  0, 0), color: SIMD3<Float>(0, 1, 0))
+        let light0 = Light(worldPosition: SIMD3<Float>( 0.5,  0, 2), color: SIMD3<Float>(1, 0, 0))
+        let light1 = Light(worldPosition: SIMD3<Float>(-0.5,  0, 2), color: SIMD3<Float>(0, 1, 0))
         let light2 = Light(worldPosition: SIMD3<Float>( 0, -2, 2), color: SIMD3<Float>(0, 0, 1))
         scene.lights = [ light0, light1, light2 ]
         
@@ -148,7 +148,8 @@ class Renderer: NSObject, MTKViewDelegate {
         let aspectRatio = Float(view.drawableSize.width / view.drawableSize.height)
         projectionMatrix = float4x4(perspectiveProjectionFov: Float.pi / 3, aspectRatio: aspectRatio, nearZ: 0.1, farZ: 100)
         
-        let angle = -time / 2
+        let angle = Float(0) // -time / 2
+        scene.lights[0].worldPosition = SIMD3<Float>(0.5,  0, 2 + sin(time)*0.1)
         scene.rootNode.modelMatrix = float4x4(rotationAbout: SIMD3<Float>(0, 1, 0), by: angle) *  float4x4(scaleBy: 1.5)
     }
     
