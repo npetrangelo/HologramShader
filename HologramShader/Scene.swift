@@ -80,4 +80,25 @@ class Scene {
     var rootNode = Node(name: "Root")
     var ambientLightColor = SIMD3<Float>(0, 0, 0)
     var lights = [Light]()
+    
+    static func lightCircle(numLights: Int) -> [Light] {
+        var lights: [Light] = []
+        for i in 0...numLights {
+            let angle = Float(i)/Float(numLights) * 2 * Float.pi
+            let x: Float = cos(angle) * 0.5
+            let y: Float = sin(angle) * 0.5
+            lights.append(Light(worldPosition: SIMD3<Float>(x, y, 2), color: SIMD3<Float>(1, 1, 1)))
+        }
+        return lights
+    }
+    
+    static func doubleSlit(numLights: Int) -> [Light] {
+        var lights: [Light] = []
+        for i in 0...numLights {
+            let y = Float(i)/(Float(numLights) - 1.0) - 0.5
+            lights.append(Light(worldPosition: SIMD3<Float>(-0.5, y, 2), color: SIMD3<Float>(1, 1, 1)))
+            lights.append(Light(worldPosition: SIMD3<Float>( 0.5, y, 2), color: SIMD3<Float>(1, 1, 1)))
+        }
+        return lights
+    }
 }

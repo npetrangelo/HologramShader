@@ -57,14 +57,7 @@ class Renderer: NSObject, MTKViewDelegate {
 //        let light2 = Light(worldPosition: SIMD3<Float>( 0, -0.5, 2), color: SIMD3<Float>(0, 0, 1))
 //        let light3 = Light(worldPosition: SIMD3<Float>( 0,  0.5, 2), color: SIMD3<Float>(1, 1, 1))
 //        scene.lights = [ light0, light1, light2, light3 ]
-        scene.lights = []
-        let numLights = 64
-        for i in 0...numLights {
-            let angle = Float(i)/Float(numLights) * 2 * Float.pi
-            let x: Float = cos(angle) * 0.5
-            let y: Float = sin(angle) * 0.5
-            scene.lights.append(Light(worldPosition: SIMD3<Float>(x, y, 2), color: SIMD3<Float>(1, 1, 1)))
-        }
+        scene.lights = Scene.doubleSlit(numLights: 64)
         
         let plane = Node.makePlane(device: device)
         plane.modelMatrix.scaleBy(s: 2)
@@ -196,7 +189,7 @@ class Renderer: NSObject, MTKViewDelegate {
                                                     ambientLightColor: scene.ambientLightColor,
                                                     specularColor: node.material.specularColor,
                                                     specularPower: node.material.specularPower,
-                                                    numLights: scene.lights.count)
+                                                    numLights: Int(scene.lights.count))
             commandEncoder.setFragmentBytes(&fragmentUniforms, length: MemoryLayout<FragmentUniforms>.size, index: 0)
             commandEncoder.setFragmentTexture(baseColorTexture, index: 0)
 

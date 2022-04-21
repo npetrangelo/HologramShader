@@ -39,12 +39,12 @@ class ViewController: NSViewController {
     }
 
     func getMTLDevice() -> MTLDevice {
-        let devices = MTLCopyAllDevices()
-        for device in devices {
-            if device.isRemovable {
-                return device
-            }
-        }
+//        let devices = MTLCopyAllDevices()
+//        for device in devices {
+//            if device.isRemovable {
+//                return device
+//            }
+//        }
         
         return MTLCreateSystemDefaultDevice()!
     }
