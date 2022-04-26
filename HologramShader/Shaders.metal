@@ -34,13 +34,16 @@ struct VertexUniforms {
 
 #define LightCount 3
 
-struct FragmentUniforms {
+struct SceneUniforms {
+    int numLights;
+    float frequency;
     float3 cameraWorldPosition;
     float3 ambientLightColor;
+};
+
+struct NodeUniforms {
     float3 specularColor;
     float specularPower;
-    float frequency;
-    int numLights;
 };
 
 vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]],
@@ -55,15 +58,16 @@ vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]],
 }
 
 fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
-                              constant FragmentUniforms &uniforms [[buffer(0)]],
+                              constant SceneUniforms &sceneUniforms [[buffer(0)]],
+                              constant NodeUniforms &nodeUniforms [[buffer(1)]],
+                              constant Light* lights [[buffer(2)]],
                               texture2d<float, access::sample> baseColorTexture [[texture(0)]],
-                              sampler baseColorSampler [[sampler(0)]],
-                              constant Light* lights [[buffer(1)]]) {
+                              sampler baseColorSampler [[sampler(0)]]) {
     float3 baseColor = baseColorTexture.sample(baseColorSampler, fragmentIn.texCoords).rgb;
-    float3 specularColor = uniforms.specularColor;
+    float3 specularColor = nodeUniforms.specularColor;
     
     float3 N = normalize(fragmentIn.worldNormal);
-    float3 V = normalize(uniforms.cameraWorldPosition - fragmentIn.worldPosition);
+    float3 V = normalize(sceneUniforms.cameraWorldPosition - fragmentIn.worldPosition);
 
     float3 finalColor(0, 0, 0);
     for (int i = 0; i < LightCount; ++i) {
@@ -71,9 +75,9 @@ fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
         float3 diffuseIntensity = saturate(dot(N, L));
         float3 H = normalize(L + V);
         float specularBase = saturate(dot(N, H));
-        float specularIntensity = powr(specularBase, uniforms.specularPower);
+        float specularIntensity = powr(specularBase, nodeUniforms.specularPower);
         float3 lightColor = lights[i].color;
-        finalColor += uniforms.ambientLightColor * baseColor +
+        finalColor += sceneUniforms.ambientLightColor * baseColor +
                       diffuseIntensity * lightColor * baseColor +
                       specularIntensity * lightColor * specularColor;
     }
@@ -81,15 +85,17 @@ fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
 }
 
 fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
-                                  constant FragmentUniforms &uniforms [[buffer(0)]],
+                                  constant SceneUniforms &sceneUniforms [[buffer(0)]],
+                                  constant NodeUniforms &nodeUniforms [[buffer(1)]],
+                                  constant Light* lights [[buffer(2)]],
                                   texture2d<float, access::sample> baseColorTexture [[texture(0)]],
-                                  sampler baseColorSampler [[sampler(0)]],
-                                  constant Light* lights [[buffer(1)]]) {
+                                  sampler baseColorSampler [[sampler(0)]]) {
     float3 finalColor = float3(0, 0, 0);
-    for (int i = 0; i < uniforms.numLights; i++) {
-        float distance = length(fragmentIn.worldPosition - lights[i].worldPosition) * uniforms.frequency;
-        finalColor += (float3(cos(distance), sin(distance), 0) + float3(1, 1, 0))/uniforms.numLights;
+    for (int i = 0; i < sceneUniforms.numLights; i++) {
+        float distance = length(fragmentIn.worldPosition - lights[i].worldPosition) * sceneUniforms.frequency;
+//        float distance_sq = distance * distance;
+        finalColor += (float3(cos(distance), sin(distance), 0) + float3(1, 1, 0))/2;
     }
     
-    return float4(finalColor/2, 1);
+    return float4(finalColor/sceneUniforms.numLights, 1);
 }

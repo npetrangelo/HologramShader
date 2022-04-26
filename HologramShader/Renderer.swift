@@ -15,13 +15,16 @@ struct VertexUniforms {
     var normalMatrix: float3x3
 }
 
-struct FragmentUniforms {
+struct SceneUniforms {
+    var numLights = Int32(0)
+    var frequency = Float(300)
     var cameraWorldPosition = SIMD3<Float>(0, 0, 0)
-    var ambientLightColor = SIMD3<Float>(0, 0, 0)
-    var specularColor = SIMD3<Float>(1, 1, 1)
-    var specularPower = Float(1)
-    var frequency = Float(200)
-    var numLights = Int(1)
+    var ambientLightColor = SIMD3<Float>(0.1, 0.1, 0.1)
+}
+
+struct NodeUniforms {
+    var specularColor = SIMD3<Float>(0, 0, 0)
+    var specularPower = Float(0)
 }
 
 class Renderer: NSObject, MTKViewDelegate {
@@ -163,13 +166,19 @@ class Renderer: NSObject, MTKViewDelegate {
         let lightSize = scene.lights.count * MemoryLayout<Light>.size
         let lightBuffer = device.makeBuffer(bytes: scene.lights, length: lightSize, options: [])
         
+        var sceneUniforms = SceneUniforms(numLights: Int32(scene.lights.count),
+                                          frequency: scene.frequency,
+                                          cameraWorldPosition: cameraWorldPosition,
+                                          ambientLightColor: scene.ambientLightColor)
+        
         let commandBuffer = commandQueue.makeCommandBuffer()!
         if let renderPassDescriptor = view.currentRenderPassDescriptor, let drawable = view.currentDrawable {
             let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)!
             commandEncoder.setDepthStencilState(depthStencilState)
             commandEncoder.setRenderPipelineState(renderPipeline)
             commandEncoder.setFragmentSamplerState(samplerState, index: 0)
-            commandEncoder.setFragmentBuffer(lightBuffer, offset: 0, index: 1)
+            commandEncoder.setFragmentBytes(&sceneUniforms, length: MemoryLayout<SceneUniforms>.size, index: 0)
+            commandEncoder.setFragmentBuffer(lightBuffer, offset: 0, index: 2)
             drawNodeRecursive(scene.rootNode, parentTransform: matrix_identity_float4x4, commandEncoder: commandEncoder)
             commandEncoder.endEncoding()
             commandBuffer.present(drawable)
@@ -187,13 +196,9 @@ class Renderer: NSObject, MTKViewDelegate {
                                                 normalMatrix: modelMatrix.normalMatrix)
             commandEncoder.setVertexBytes(&vertexUniforms, length: MemoryLayout<VertexUniforms>.size, index: 1)
             
-            var fragmentUniforms = FragmentUniforms(cameraWorldPosition: cameraWorldPosition,
-                                                    ambientLightColor: scene.ambientLightColor,
-                                                    specularColor: node.material.specularColor,
-                                                    specularPower: node.material.specularPower,
-                                                    frequency: scene.frequency,
-                                                    numLights: Int(scene.lights.count))
-            commandEncoder.setFragmentBytes(&fragmentUniforms, length: MemoryLayout<FragmentUniforms>.size, index: 0)
+            var nodeUniforms = NodeUniforms(specularColor: node.material.specularColor,
+                                            specularPower: node.material.specularPower)
+            commandEncoder.setFragmentBytes(&nodeUniforms, length: MemoryLayout<NodeUniforms>.size, index: 1)
             commandEncoder.setFragmentTexture(baseColorTexture, index: 0)
 
             let vertexBuffer = mesh.vertexBuffers.first!
