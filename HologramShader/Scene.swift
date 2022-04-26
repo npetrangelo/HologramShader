@@ -84,7 +84,7 @@ class Scene {
     
     static func lightCircle(numLights: Int) -> [Light] {
         var lights: [Light] = []
-        for i in 0...numLights {
+        for i in 0...(numLights-1) {
             let angle = Float(i)/Float(numLights) * 2 * Float.pi
             let x: Float = cos(angle) * 0.5
             let y: Float = sin(angle) * 0.5
