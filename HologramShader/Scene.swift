@@ -79,6 +79,7 @@ class Node {
 class Scene {
     var rootNode = Node(name: "Root")
     var ambientLightColor = SIMD3<Float>(0, 0, 0)
+    var frequency = Float(200)
     var lights = [Light]()
     
     static func lightCircle(numLights: Int) -> [Light] {
