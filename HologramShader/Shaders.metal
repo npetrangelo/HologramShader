@@ -84,6 +84,26 @@ fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
     return float4(finalColor, 1);
 }
 
+float3 hue_from_angle(float angle) {
+    // Convert angle to degrees for convenience
+    angle *= 180.0/M_PI_F;
+    angle = fmod(angle, 360.0);
+    if (angle >= 0.0 and angle < 60.0) {
+        return float3(1, angle/60, 0);
+    } else if (angle >= 60.0 and angle < 120.0) {
+        
+    } else if (angle >= 120.0 and angle < 180.0) {
+        
+    } else if (angle >= 180.0 and angle < 240.0) {
+        
+    } else if (angle >= 240.0 and angle < 300.0) {
+        
+    } else if (angle >= 300.0 and angle <= 360.0) {
+        
+    }
+    return float3(0, 0, 0);
+}
+
 fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
                                   constant SceneUniforms &sceneUniforms [[buffer(0)]],
                                   constant NodeUniforms &nodeUniforms [[buffer(1)]],
