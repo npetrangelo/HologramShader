@@ -30,8 +30,8 @@ struct NodeUniforms {
 class Renderer: NSObject, MTKViewDelegate {
     let device: MTLDevice
     let commandQueue: MTLCommandQueue
-    var renderPipeline: MTLRenderPipelineState
-    var pipelineReflection: MTLRenderPipelineReflection?
+    let renderPipeline: MTLRenderPipelineState
+    let pipelineReflection: MTLRenderPipelineReflection?
     let depthStencilState: MTLDepthStencilState
     let samplerState: MTLSamplerState
     let scene: Scene
@@ -48,7 +48,6 @@ class Renderer: NSObject, MTKViewDelegate {
         depthStencilState = Renderer.buildDepthStencilState(device: device)
         
         let vertexDescriptor = Renderer.buildVertexDescriptor()
-        pipelineReflection = MTLRenderPipelineReflection()
         (renderPipeline, pipelineReflection) = Renderer.buildPipeline(device: device, view: view, vertexDescriptor: vertexDescriptor)
         scene = Renderer.buildScene(device: device, vertexDescriptor: vertexDescriptor)
         super.init()
