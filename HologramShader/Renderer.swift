@@ -31,6 +31,7 @@ class Renderer: NSObject, MTKViewDelegate {
     let device: MTLDevice
     let commandQueue: MTLCommandQueue
     var renderPipeline: MTLRenderPipelineState
+    var pipelineReflection: MTLRenderPipelineReflection?
     let depthStencilState: MTLDepthStencilState
     let samplerState: MTLSamplerState
     let scene: Scene
@@ -47,7 +48,8 @@ class Renderer: NSObject, MTKViewDelegate {
         depthStencilState = Renderer.buildDepthStencilState(device: device)
         
         let vertexDescriptor = Renderer.buildVertexDescriptor()
-        renderPipeline = Renderer.buildPipeline(device: device, view: view, vertexDescriptor: vertexDescriptor)
+        pipelineReflection = MTLRenderPipelineReflection()
+        (renderPipeline, pipelineReflection) = Renderer.buildPipeline(device: device, view: view, vertexDescriptor: vertexDescriptor)
         scene = Renderer.buildScene(device: device, vertexDescriptor: vertexDescriptor)
         super.init()
     }
@@ -105,7 +107,7 @@ class Renderer: NSObject, MTKViewDelegate {
         return device.makeDepthStencilState(descriptor: depthStencilDescriptor)!
     }
     
-    static func buildPipeline(device: MTLDevice, view: MTKView, vertexDescriptor: MDLVertexDescriptor) -> MTLRenderPipelineState {
+    static func buildPipeline(device: MTLDevice, view: MTKView, vertexDescriptor: MDLVertexDescriptor) -> (MTLRenderPipelineState, MTLRenderPipelineReflection?) {
         guard let library = device.makeDefaultLibrary() else {
             fatalError("Could not load default library from main bundle")
         }
@@ -116,7 +118,7 @@ class Renderer: NSObject, MTKViewDelegate {
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
         pipelineDescriptor.vertexFunction = vertexFunction
         pipelineDescriptor.fragmentFunction = fragmentFunction
-        
+                
         pipelineDescriptor.colorAttachments[0].pixelFormat = view.colorPixelFormat
         pipelineDescriptor.depthAttachmentPixelFormat = view.depthStencilPixelFormat
         Renderer.configAlphaBlend(pipelineDescriptor: pipelineDescriptor)
@@ -124,8 +126,11 @@ class Renderer: NSObject, MTKViewDelegate {
         let mtlVertexDescriptor = MTKMetalVertexDescriptorFromModelIO(vertexDescriptor)
         pipelineDescriptor.vertexDescriptor = mtlVertexDescriptor
         
+        var pipelineReflection: MTLRenderPipelineReflection? = nil
+        
         do {
-            return try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
+            let pipelineState = try device.makeRenderPipelineState(descriptor: pipelineDescriptor, options: [], reflection: &pipelineReflection)
+            return (pipelineState, pipelineReflection)
         } catch {
             fatalError("Could not create render pipeline state object: \(error)")
         }
