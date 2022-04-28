@@ -13,6 +13,12 @@ struct PointLight {
     var color = SIMD3<Float>(0, 0, 0)
 }
 
+struct SunLight {
+    var worldPosition = SIMD3<Float>(0, 0, 0)
+    var color = SIMD3<Float>(0, 0, 0)
+    var dir = SIMD3<Float>(0, 0, 1)
+}
+
 class Material {
     var specularColor = SIMD3<Float>(1, 1, 1)
     var specularPower = Float(1)
@@ -81,6 +87,7 @@ class Scene {
     var ambientLightColor = SIMD3<Float>(0, 0, 0)
     var frequency = Float(200)
     var pointLights = [PointLight]()
+    var sunLights = [SunLight]()
     
     static func lightCircle(numLights: Int) -> [PointLight] {
         var lights: [PointLight] = []
