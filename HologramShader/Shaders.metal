@@ -123,9 +123,9 @@ fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
                                   sampler baseColorSampler [[sampler(0)]]) {
     float2 phases = float2(0, 0);
     for (int i = 0; i < sceneUniforms.numPointLights; i++) {
-        float distance = length(fragmentIn.worldPosition - point_lights[i].worldPosition) * sceneUniforms.frequency;
+        float dist = distance(fragmentIn.worldPosition, point_lights[i].worldPosition) * sceneUniforms.frequency;
 //        float distance_sq = distance * distance;
-        phases += float2(cos(distance), sin(distance));
+        phases += float2(cos(dist), sin(dist));
     }
     float angle = atan2(phases.y, phases.x);
     if (angle < 0) {
