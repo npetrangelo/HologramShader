@@ -16,7 +16,8 @@ struct VertexUniforms {
 }
 
 struct SceneUniforms {
-    var numLights = Int32(0)
+    var numPointLights = Int32(0)
+    var numSunLights = Int32(0)
     var frequency = Float(300)
     var cameraWorldPosition = SIMD3<Float>(0, 0, 0)
     var ambientLightColor = SIMD3<Float>(0.1, 0.1, 0.1)
@@ -62,6 +63,7 @@ class Renderer: NSObject, MTKViewDelegate {
 //        let light3 = Light(worldPosition: SIMD3<Float>( 0,  0.5, 2), color: SIMD3<Float>(1, 1, 1))
 //        scene.lights = [ light0, light1, light2, light3 ]
         scene.pointLights = Scene.lightCircle(numLights: 64)
+        scene.sunLights.append(SunLight(worldPosition: SIMD3<Float>(0, 0, 2)))
         
         let plane = Node.makePlane(device: device)
         plane.modelMatrix.scaleBy(s: 2)
@@ -166,10 +168,14 @@ class Renderer: NSObject, MTKViewDelegate {
     func draw(in view: MTKView) {
         update(view)
         
-        let lightSize = scene.pointLights.count * MemoryLayout<PointLight>.size
-        let pointLightBuffer = device.makeBuffer(bytes: scene.pointLights, length: lightSize, options: [])
+        let pointLightSize = scene.pointLights.count * MemoryLayout<PointLight>.size
+        let pointLightBuffer = device.makeBuffer(bytes: scene.pointLights, length: pointLightSize, options: [])
         
-        var sceneUniforms = SceneUniforms(numLights: Int32(scene.pointLights.count),
+        let sunLightSize = scene.sunLights.count * MemoryLayout<SunLight>.size
+        let sunLightBuffer = device.makeBuffer(bytes: scene.sunLights, length: sunLightSize, options: [])
+        
+        var sceneUniforms = SceneUniforms(numPointLights: Int32(scene.pointLights.count),
+                                          numSunLights: Int32(scene.sunLights.count),
                                           frequency: scene.frequency,
                                           cameraWorldPosition: scene.cameraWorldPosition,
                                           ambientLightColor: scene.ambientLightColor)
@@ -182,6 +188,7 @@ class Renderer: NSObject, MTKViewDelegate {
             commandEncoder.setFragmentSamplerState(samplerState, index: 0)
             commandEncoder.setFragmentBytes(&sceneUniforms, length: MemoryLayout<SceneUniforms>.size, index: 0)
             commandEncoder.setFragmentBuffer(pointLightBuffer, offset: 0, index: 2)
+            commandEncoder.setFragmentBuffer(sunLightBuffer, offset: 0, index: 3)
             drawNodeRecursive(scene.rootNode, parentTransform: matrix_identity_float4x4, commandEncoder: commandEncoder)
             commandEncoder.endEncoding()
             commandBuffer.present(drawable)

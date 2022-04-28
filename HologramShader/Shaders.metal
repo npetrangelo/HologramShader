@@ -35,7 +35,8 @@ struct VertexUniforms {
 #define LightCount 3
 
 struct SceneUniforms {
-    int numLights;
+    int numPointLights;
+    int numSunLights;
     float frequency;
     float3 cameraWorldPosition;
     float3 ambientLightColor;
@@ -114,7 +115,7 @@ fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
                                   texture2d<float, access::sample> baseColorTexture [[texture(0)]],
                                   sampler baseColorSampler [[sampler(0)]]) {
     float2 phases = float2(0, 0);
-    for (int i = 0; i < sceneUniforms.numLights; i++) {
+    for (int i = 0; i < sceneUniforms.numPointLights; i++) {
         float distance = length(fragmentIn.worldPosition - point_lights[i].worldPosition) * sceneUniforms.frequency;
 //        float distance_sq = distance * distance;
         phases += float2(cos(distance), sin(distance));
@@ -124,7 +125,7 @@ fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
         angle += 2*M_PI_F;
     }
     // Saturation = 0 means just amplitude, saturation = 1 means also display phase as hue
-    float3 hsv = float3(angle, 0, length(phases)/sceneUniforms.numLights);
+    float3 hsv = float3(angle, 0, length(phases)/sceneUniforms.numPointLights);
     float3 finalColor = hsv2rgb(hsv);
     return float4(finalColor, 1);
 }
