@@ -84,24 +84,27 @@ fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
     return float4(finalColor, 1);
 }
 
-float3 hue_from_angle(float angle) {
-    // Convert angle to degrees for convenience
-    angle *= 180.0/M_PI_F;
-    angle = fmod(angle, 360.0);
-    if (angle >= 0.0 and angle < 60.0) {
-        return float3(1, angle/60, 0);
-    } else if (angle >= 60.0 and angle < 120.0) {
-        
-    } else if (angle >= 120.0 and angle < 180.0) {
-        
-    } else if (angle >= 180.0 and angle < 240.0) {
-        
-    } else if (angle >= 240.0 and angle < 300.0) {
-        
-    } else if (angle >= 300.0 and angle <= 360.0) {
-        
+float3 hsv2rgb(float3 hsv) {
+    float c = hsv[2] * hsv[1];
+    float h_prime = hsv[0] / (M_PI_F/3);
+    float x = c * (1 - abs(fmod(h_prime, 2) - 1));
+    float3 rgb = float3(0);
+    if (h_prime >= 0 and h_prime < 1) {
+        rgb = float3(c, x, 0);
+    } else if (h_prime >= 1 and h_prime < 2) {
+        rgb = float3(x, c, 0);
+    } else if (h_prime >= 2 and h_prime < 3) {
+        rgb = float3(0, c, x);
+    } else if (h_prime >= 3 and h_prime < 4) {
+        rgb = float3(0, x, c);
+    } else if (h_prime >= 4 and h_prime < 5) {
+        rgb = float3(x, 0, c);
+    } else if (h_prime >= 5 and h_prime < 6) {
+        rgb = float3(c, 0, x);
     }
-    return float3(0, 0, 0);
+    
+    float m = hsv[2] - c;
+    return rgb + float3(m);
 }
 
 fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
@@ -110,12 +113,17 @@ fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
                                   constant Light* lights [[buffer(2)]],
                                   texture2d<float, access::sample> baseColorTexture [[texture(0)]],
                                   sampler baseColorSampler [[sampler(0)]]) {
-    float3 finalColor = float3(0, 0, 0);
+    float2 phases = float2(0, 0);
     for (int i = 0; i < sceneUniforms.numLights; i++) {
         float distance = length(fragmentIn.worldPosition - lights[i].worldPosition) * sceneUniforms.frequency;
 //        float distance_sq = distance * distance;
-        finalColor += (float3(cos(distance), sin(distance), 0) + float3(1, 1, 0))/2;
+        phases += float2(cos(distance), sin(distance));
     }
-    
-    return float4(finalColor/sceneUniforms.numLights, 1);
+    float angle = atan2(phases.y, phases.x);
+    if (angle < 0) {
+        angle += 2*M_PI_F;
+    }
+    float3 hsv = float3(angle, 1, length(phases)/sceneUniforms.numLights);
+    float3 finalColor = hsv2rgb(hsv);
+    return float4(finalColor, 1);
 }
