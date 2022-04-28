@@ -16,7 +16,7 @@ struct PointLight {
 struct SunLight {
     var worldPosition = SIMD3<Float>(0, 0, 0)
     var color = SIMD3<Float>(0, 0, 0)
-    var dir = SIMD3<Float>(0, 0, 1)
+    var normal = SIMD3<Float>(0, 0, 1)
 }
 
 class Material {

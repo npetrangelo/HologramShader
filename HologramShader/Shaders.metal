@@ -29,7 +29,7 @@ struct PointLight {
 struct SunLight {
     float3 worldPosition;
     float3 color;
-    float3 dir;
+    float3 normal;
 };
 
 struct VertexUniforms {
