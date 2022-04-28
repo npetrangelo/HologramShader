@@ -126,17 +126,27 @@ fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
                                   texture2d<float, access::sample> baseColorTexture [[texture(0)]],
                                   sampler baseColorSampler [[sampler(0)]]) {
     float2 phases = float2(0, 0);
+    
+    // Run through point lights
     for (int i = 0; i < sceneUniforms.numPointLights; i++) {
         float dist = distance(fragmentIn.worldPosition, point_lights[i].worldPosition) * sceneUniforms.frequency;
 //        float distance_sq = distance * distance;
         phases += float2(cos(dist), sin(dist));
     }
+    
+    // Run through sun lights
+    for (int i = 0; i < sceneUniforms.numSunLights; i++) {
+        SunLight l = sun_lights[i];
+        float dist = distanceFromPointToPlane(fragmentIn.worldPosition, l.worldPosition, l.normal);
+        phases += float2(cos(dist), sin(dist));
+    }
+    
     float angle = atan2(phases.y, phases.x);
     if (angle < 0) {
         angle += 2*M_PI_F;
     }
     // Saturation = 0 means just amplitude, saturation = 1 means also display phase as hue
-    float3 hsv = float3(angle, 0, length(phases)/sceneUniforms.numPointLights);
+    float3 hsv = float3(angle, 1, length(phases)/(sceneUniforms.numPointLights + sceneUniforms.numSunLights));
     float3 finalColor = hsv2rgb(hsv);
     return float4(finalColor, 1);
 }
