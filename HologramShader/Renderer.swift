@@ -113,7 +113,7 @@ class Renderer: NSObject, MTKViewDelegate {
         }
         
         let vertexFunction = library.makeFunction(name: "vertex_main")
-        let fragmentFunction = library.makeFunction(name: "fragment_hologram")
+        let fragmentFunction = library.makeFunction(name: "fragment_hologram_view")
         
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
         pipelineDescriptor.vertexFunction = vertexFunction

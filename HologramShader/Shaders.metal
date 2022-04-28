@@ -118,7 +118,7 @@ float distanceFromPointToPlane(float3 point, float3 normal, float3 planePos) {
     return dot(point - planePos, normalize(normal));
 }
 
-fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
+fragment float4 fragment_hologram_expose(VertexOut fragmentIn [[stage_in]],
                                   constant SceneUniforms &sceneUniforms [[buffer(0)]],
                                   constant NodeUniforms &nodeUniforms [[buffer(1)]],
                                   constant PointLight* point_lights [[buffer(2)]],
@@ -147,6 +147,31 @@ fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
     }
     // Saturation = 0 means just amplitude, saturation = 1 means also display phase as hue
     float3 hsv = float3(angle, 1, length(phases)/(sceneUniforms.numPointLights + sceneUniforms.numSunLights));
+    float3 finalColor = hsv2rgb(hsv);
+    return float4(finalColor, 1);
+}
+
+fragment float4 fragment_hologram_view(VertexOut fragmentIn [[stage_in]],
+                                  constant SceneUniforms &sceneUniforms [[buffer(0)]],
+                                  constant NodeUniforms &nodeUniforms [[buffer(1)]],
+                                  constant PointLight* point_lights [[buffer(2)]],
+                                  texture2d<float, access::sample> baseColorTexture [[texture(0)]],
+                                  sampler baseColorSampler [[sampler(0)]]) {
+    float2 phases = float2(0, 0);
+    
+    // Run through point lights
+    for (int i = 0; i < sceneUniforms.numPointLights; i++) {
+        float dist = distance(fragmentIn.worldPosition, point_lights[i].worldPosition) * sceneUniforms.frequency;
+//        float distance_sq = distance * distance;
+        phases += float2(cos(dist), sin(dist));
+    }
+    
+    float angle = atan2(phases.y, phases.x);
+    if (angle < 0) {
+        angle += 2*M_PI_F;
+    }
+    // Saturation = 0 means just amplitude, saturation = 1 means also display phase as hue
+    float3 hsv = float3(angle, 1, length(phases)/sceneUniforms.numPointLights);
     float3 finalColor = hsv2rgb(hsv);
     return float4(finalColor, 1);
 }
