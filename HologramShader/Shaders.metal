@@ -26,6 +26,12 @@ struct PointLight {
     float3 color;
 };
 
+struct SunLight {
+    float3 worldPosition;
+    float3 color;
+    float3 dir;
+};
+
 struct VertexUniforms {
     float4x4 viewProjectionMatrix;
     float4x4 modelMatrix;
@@ -112,6 +118,7 @@ fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
                                   constant SceneUniforms &sceneUniforms [[buffer(0)]],
                                   constant NodeUniforms &nodeUniforms [[buffer(1)]],
                                   constant PointLight* point_lights [[buffer(2)]],
+                                  constant SunLight* sun_lights [[buffer(3)]],
                                   texture2d<float, access::sample> baseColorTexture [[texture(0)]],
                                   sampler baseColorSampler [[sampler(0)]]) {
     float2 phases = float2(0, 0);
