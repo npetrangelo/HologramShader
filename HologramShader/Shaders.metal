@@ -114,6 +114,10 @@ float3 hsv2rgb(float3 hsv) {
     return rgb + float3(m);
 }
 
+float distanceFromPointToPlane(float3 point, float3 normal, float3 planePos) {
+    return dot(point - planePos, normalize(normal));
+}
+
 fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
                                   constant SceneUniforms &sceneUniforms [[buffer(0)]],
                                   constant NodeUniforms &nodeUniforms [[buffer(1)]],
