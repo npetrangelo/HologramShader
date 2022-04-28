@@ -8,7 +8,7 @@
 import MetalKit
 import simd
 
-struct Light {
+struct PointLight {
     var worldPosition = SIMD3<Float>(0, 0, 0)
     var color = SIMD3<Float>(0, 0, 0)
 }
@@ -80,25 +80,25 @@ class Scene {
     var rootNode = Node(name: "Root")
     var ambientLightColor = SIMD3<Float>(0, 0, 0)
     var frequency = Float(200)
-    var lights = [Light]()
+    var pointLights = [PointLight]()
     
-    static func lightCircle(numLights: Int) -> [Light] {
-        var lights: [Light] = []
+    static func lightCircle(numLights: Int) -> [PointLight] {
+        var lights: [PointLight] = []
         for i in 0...(numLights-1) {
             let angle = Float(i)/Float(numLights) * 2 * Float.pi
             let x: Float = cos(angle) * 0.5
             let y: Float = sin(angle) * 0.5
-            lights.append(Light(worldPosition: SIMD3<Float>(x, y, 2), color: SIMD3<Float>(1, 1, 1)))
+            lights.append(PointLight(worldPosition: SIMD3<Float>(x, y, 2), color: SIMD3<Float>(1, 1, 1)))
         }
         return lights
     }
     
-    static func doubleSlit(numLights: Int) -> [Light] {
-        var lights: [Light] = []
+    static func doubleSlit(numLights: Int) -> [PointLight] {
+        var lights: [PointLight] = []
         for i in 0...numLights {
             let y = Float(i)/(Float(numLights) - 1.0) - 0.5
-            lights.append(Light(worldPosition: SIMD3<Float>(-0.5, y, 2), color: SIMD3<Float>(1, 1, 1)))
-            lights.append(Light(worldPosition: SIMD3<Float>( 0.5, y, 2), color: SIMD3<Float>(1, 1, 1)))
+            lights.append(PointLight(worldPosition: SIMD3<Float>(-0.5, y, 2), color: SIMD3<Float>(1, 1, 1)))
+            lights.append(PointLight(worldPosition: SIMD3<Float>( 0.5, y, 2), color: SIMD3<Float>(1, 1, 1)))
         }
         return lights
     }

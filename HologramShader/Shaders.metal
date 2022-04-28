@@ -21,7 +21,7 @@ struct VertexOut {
     float2 texCoords;
 };
 
-struct Light {
+struct PointLight {
     float3 worldPosition;
     float3 color;
 };
@@ -60,7 +60,7 @@ vertex VertexOut vertex_main(VertexIn vertexIn [[stage_in]],
 fragment float4 fragment_main(VertexOut fragmentIn [[stage_in]],
                               constant SceneUniforms &sceneUniforms [[buffer(0)]],
                               constant NodeUniforms &nodeUniforms [[buffer(1)]],
-                              constant Light* lights [[buffer(2)]],
+                              constant PointLight* lights [[buffer(2)]],
                               texture2d<float, access::sample> baseColorTexture [[texture(0)]],
                               sampler baseColorSampler [[sampler(0)]]) {
     float3 baseColor = baseColorTexture.sample(baseColorSampler, fragmentIn.texCoords).rgb;
@@ -110,12 +110,12 @@ float3 hsv2rgb(float3 hsv) {
 fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
                                   constant SceneUniforms &sceneUniforms [[buffer(0)]],
                                   constant NodeUniforms &nodeUniforms [[buffer(1)]],
-                                  constant Light* lights [[buffer(2)]],
+                                  constant PointLight* point_lights [[buffer(2)]],
                                   texture2d<float, access::sample> baseColorTexture [[texture(0)]],
                                   sampler baseColorSampler [[sampler(0)]]) {
     float2 phases = float2(0, 0);
     for (int i = 0; i < sceneUniforms.numLights; i++) {
-        float distance = length(fragmentIn.worldPosition - lights[i].worldPosition) * sceneUniforms.frequency;
+        float distance = length(fragmentIn.worldPosition - point_lights[i].worldPosition) * sceneUniforms.frequency;
 //        float distance_sq = distance * distance;
         phases += float2(cos(distance), sin(distance));
     }
@@ -124,7 +124,7 @@ fragment float4 fragment_hologram(VertexOut fragmentIn [[stage_in]],
         angle += 2*M_PI_F;
     }
     // Saturation = 0 means just amplitude, saturation = 1 means also display phase as hue
-    float3 hsv = float3(angle, 0.25, length(phases)/sceneUniforms.numLights);
+    float3 hsv = float3(angle, 0, length(phases)/sceneUniforms.numLights);
     float3 finalColor = hsv2rgb(hsv);
     return float4(finalColor, 1);
 }

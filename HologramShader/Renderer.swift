@@ -62,7 +62,7 @@ class Renderer: NSObject, MTKViewDelegate {
 //        let light2 = Light(worldPosition: SIMD3<Float>( 0, -0.5, 2), color: SIMD3<Float>(0, 0, 1))
 //        let light3 = Light(worldPosition: SIMD3<Float>( 0,  0.5, 2), color: SIMD3<Float>(1, 1, 1))
 //        scene.lights = [ light0, light1, light2, light3 ]
-        scene.lights = Scene.lightCircle(numLights: 64)
+        scene.pointLights = Scene.lightCircle(numLights: 64)
         
         let plane = Node.makePlane(device: device)
         plane.modelMatrix.scaleBy(s: 2)
@@ -167,10 +167,10 @@ class Renderer: NSObject, MTKViewDelegate {
     func draw(in view: MTKView) {
         update(view)
         
-        let lightSize = scene.lights.count * MemoryLayout<Light>.size
-        let lightBuffer = device.makeBuffer(bytes: scene.lights, length: lightSize, options: [])
+        let lightSize = scene.pointLights.count * MemoryLayout<PointLight>.size
+        let pointLightBuffer = device.makeBuffer(bytes: scene.pointLights, length: lightSize, options: [])
         
-        var sceneUniforms = SceneUniforms(numLights: Int32(scene.lights.count),
+        var sceneUniforms = SceneUniforms(numLights: Int32(scene.pointLights.count),
                                           frequency: scene.frequency,
                                           cameraWorldPosition: cameraWorldPosition,
                                           ambientLightColor: scene.ambientLightColor)
@@ -182,7 +182,7 @@ class Renderer: NSObject, MTKViewDelegate {
             commandEncoder.setRenderPipelineState(renderPipeline)
             commandEncoder.setFragmentSamplerState(samplerState, index: 0)
             commandEncoder.setFragmentBytes(&sceneUniforms, length: MemoryLayout<SceneUniforms>.size, index: 0)
-            commandEncoder.setFragmentBuffer(lightBuffer, offset: 0, index: 2)
+            commandEncoder.setFragmentBuffer(pointLightBuffer, offset: 0, index: 2)
             drawNodeRecursive(scene.rootNode, parentTransform: matrix_identity_float4x4, commandEncoder: commandEncoder)
             commandEncoder.endEncoding()
             commandBuffer.present(drawable)
