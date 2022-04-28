@@ -37,7 +37,6 @@ class Renderer: NSObject, MTKViewDelegate {
     let scene: Scene
     
     var time: Float = 0
-    var cameraWorldPosition = SIMD3<Float>(0, 0, 2)
     var viewMatrix = matrix_identity_float4x4
     var projectionMatrix = matrix_identity_float4x4
 
@@ -149,8 +148,8 @@ class Renderer: NSObject, MTKViewDelegate {
     func update(_ view: MTKView) {
         time += 1 / Float(view.preferredFramesPerSecond)
         
-        cameraWorldPosition = SIMD3<Float>(0, 0, 2)
-        viewMatrix = float4x4(translationBy: -cameraWorldPosition)
+        scene.cameraWorldPosition = SIMD3<Float>(0, 0, 2)
+        viewMatrix = float4x4(translationBy: -scene.cameraWorldPosition)
         
         let aspectRatio = Float(view.drawableSize.width / view.drawableSize.height)
         projectionMatrix = float4x4(perspectiveProjectionFov: Float.pi / 3, aspectRatio: aspectRatio, nearZ: 0.1, farZ: 100)
@@ -172,7 +171,7 @@ class Renderer: NSObject, MTKViewDelegate {
         
         var sceneUniforms = SceneUniforms(numLights: Int32(scene.pointLights.count),
                                           frequency: scene.frequency,
-                                          cameraWorldPosition: cameraWorldPosition,
+                                          cameraWorldPosition: scene.cameraWorldPosition,
                                           ambientLightColor: scene.ambientLightColor)
         
         let commandBuffer = commandQueue.makeCommandBuffer()!

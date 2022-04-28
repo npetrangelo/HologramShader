@@ -84,6 +84,7 @@ class Node {
 
 class Scene {
     var rootNode = Node(name: "Root")
+    var cameraWorldPosition = SIMD3<Float>(0, 0, 2)
     var ambientLightColor = SIMD3<Float>(0, 0, 0)
     var frequency = Float(200)
     var pointLights = [PointLight]()
