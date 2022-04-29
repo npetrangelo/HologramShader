@@ -62,7 +62,8 @@ class Renderer: NSObject, MTKViewDelegate {
 //        let light2 = Light(worldPosition: SIMD3<Float>( 0, -0.5, 2), color: SIMD3<Float>(0, 0, 1))
 //        let light3 = Light(worldPosition: SIMD3<Float>( 0,  0.5, 2), color: SIMD3<Float>(1, 1, 1))
 //        scene.lights = [ light0, light1, light2, light3 ]
-        scene.pointLights = Scene.lightCircle(numLights: 64)
+//        scene.pointLights = Scene.lightCircle(numLights: 64)
+        scene.pointLights.append(PointLight(worldPosition: SIMD3<Float>(0, 0, 2), color: SIMD3<Float>(1,1,1)))
         scene.sunLights.append(SunLight(worldPosition: SIMD3<Float>(0, 0, 2)))
         
         let plane = Node.makePlane(device: device)
@@ -113,7 +114,7 @@ class Renderer: NSObject, MTKViewDelegate {
         }
         
         let vertexFunction = library.makeFunction(name: "vertex_main")
-        let fragmentFunction = library.makeFunction(name: "fragment_hologram_view")
+        let fragmentFunction = library.makeFunction(name: "fragment_hologram_expose")
         
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
         pipelineDescriptor.vertexFunction = vertexFunction
