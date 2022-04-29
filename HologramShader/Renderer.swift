@@ -159,7 +159,7 @@ class Renderer: NSObject, MTKViewDelegate {
         
         let angle = Float(0) // -time / 2
 //        scene.lights[0].worldPosition = SIMD3<Float>(0.5,  0, 2 + sin(time)*0.1)
-        scene.frequency = Float(10*sin(time) + 300)
+        scene.frequency = 300 //Float(10*sin(time) + 300)
         scene.rootNode.modelMatrix = float4x4(rotationAbout: SIMD3<Float>(0, 1, 0), by: angle) *  float4x4(scaleBy: 1.5)
     }
     

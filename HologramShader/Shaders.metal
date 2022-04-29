@@ -146,7 +146,7 @@ fragment float4 fragment_hologram_expose(VertexOut fragmentIn [[stage_in]],
         angle += 2*M_PI_F;
     }
     // Saturation = 0 means just amplitude, saturation = 1 means also display phase as hue
-    float3 hsv = float3(angle, 0, length(phases)/(sceneUniforms.numPointLights + sceneUniforms.numSunLights));
+    float3 hsv = float3(angle, 1, length(phases)/(sceneUniforms.numPointLights + sceneUniforms.numSunLights));
     float3 finalColor = hsv2rgb(hsv);
     return float4(finalColor, 1);
 }
