@@ -168,6 +168,7 @@ class Renderer: NSObject, MTKViewDelegate {
     
     func draw(in view: MTKView) {
         update(view)
+        print(scene.frequency)
         
         let pointLightSize = scene.pointLights.count * MemoryLayout<PointLight>.size
         let pointLightBuffer = device.makeBuffer(bytes: scene.pointLights, length: pointLightSize, options: [])
