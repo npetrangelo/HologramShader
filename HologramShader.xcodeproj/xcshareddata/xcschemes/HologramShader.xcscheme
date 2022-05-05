@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "904284F12808B3E5006D5CB2"
+               BlueprintIdentifier = "B1FEFF0E281CEDE300D27A9F"
                BuildableName = "HologramShader.app"
                BlueprintName = "HologramShader"
                ReferencedContainer = "container:HologramShader.xcodeproj">
@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "904285022808B3E6006D5CB2"
+               BlueprintIdentifier = "B1FEFF1F281CEDE500D27A9F"
                BuildableName = "HologramShaderTests.xctest"
                BlueprintName = "HologramShaderTests"
                ReferencedContainer = "container:HologramShader.xcodeproj">
@@ -42,7 +42,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9042850C2808B3E6006D5CB2"
+               BlueprintIdentifier = "B1FEFF29281CEDE500D27A9F"
                BuildableName = "HologramShaderUITests.xctest"
                BlueprintName = "HologramShaderUITests"
                ReferencedContainer = "container:HologramShader.xcodeproj">
@@ -64,7 +64,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "904284F12808B3E5006D5CB2"
+            BlueprintIdentifier = "B1FEFF0E281CEDE300D27A9F"
             BuildableName = "HologramShader.app"
             BlueprintName = "HologramShader"
             ReferencedContainer = "container:HologramShader.xcodeproj">
@@ -81,7 +81,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "904284F12808B3E5006D5CB2"
+            BlueprintIdentifier = "B1FEFF0E281CEDE300D27A9F"
             BuildableName = "HologramShader.app"
             BlueprintName = "HologramShader"
             ReferencedContainer = "container:HologramShader.xcodeproj">
