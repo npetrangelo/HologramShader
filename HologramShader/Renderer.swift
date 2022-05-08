@@ -62,8 +62,8 @@ class Renderer: NSObject, MTKViewDelegate {
 //        let light2 = Light(worldPosition: SIMD3<Float>( 0, -0.5, 2), color: SIMD3<Float>(0, 0, 1))
 //        let light3 = Light(worldPosition: SIMD3<Float>( 0,  0.5, 2), color: SIMD3<Float>(1, 1, 1))
 //        scene.lights = [ light0, light1, light2, light3 ]
-//        scene.pointLights = Scene.lightCircle(numLights: 64)
-        scene.pointLights.append(PointLight(worldPosition: SIMD3<Float>(0, 0, 2), color: SIMD3<Float>(1,1,1)))
+        scene.pointLights = Scene.doubleSlit(numLights: 256, width: 1, height: 2)
+//        scene.pointLights.append(PointLight(worldPosition: SIMD3<Float>(0, 0, 2), color: SIMD3<Float>(1,1,1)))
         scene.sunLights.append(SunLight(worldPosition: SIMD3<Float>(0, 0, 2)))
         
         let plane = Node.makePlane(device: device)
@@ -114,7 +114,7 @@ class Renderer: NSObject, MTKViewDelegate {
         }
         
         let vertexFunction = library.makeFunction(name: "vertex_main")
-        let fragmentFunction = library.makeFunction(name: "fragment_hologram_expose")
+        let fragmentFunction = library.makeFunction(name: "fragment_hologram_view")
         
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
         pipelineDescriptor.vertexFunction = vertexFunction
@@ -159,7 +159,8 @@ class Renderer: NSObject, MTKViewDelegate {
         
         let angle = Float(0) // -time / 2
 //        scene.lights[0].worldPosition = SIMD3<Float>(0.5,  0, 2 + sin(time)*0.1)
-        scene.frequency = 300 //Float(10*sin(time) + 300)
+        scene.frequency = 100 // Float(100*sin(time) + 300)
+        scene.rootNode.children[0].modelMatrix.translateBy(t: SIMD3<Float>(0, sin(time)*0.005, 0))
         scene.rootNode.modelMatrix = float4x4(rotationAbout: SIMD3<Float>(0, 1, 0), by: angle) *  float4x4(scaleBy: 1.5)
     }
     
@@ -168,7 +169,6 @@ class Renderer: NSObject, MTKViewDelegate {
     
     func draw(in view: MTKView) {
         update(view)
-        print(scene.frequency)
         
         let pointLightSize = scene.pointLights.count * MemoryLayout<PointLight>.size
         let pointLightBuffer = device.makeBuffer(bytes: scene.pointLights, length: pointLightSize, options: [])

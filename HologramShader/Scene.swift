@@ -101,12 +101,13 @@ class Scene {
         return lights
     }
     
-    static func doubleSlit(numLights: Int) -> [PointLight] {
+    static func doubleSlit(numLights: Int, width: Float, height: Float) -> [PointLight] {
         var lights: [PointLight] = []
         for i in 0...numLights {
-            let y = Float(i)/(Float(numLights) - 1.0) - 0.5
-            lights.append(PointLight(worldPosition: SIMD3<Float>(-0.5, y, 2), color: SIMD3<Float>(1, 1, 1)))
-            lights.append(PointLight(worldPosition: SIMD3<Float>( 0.5, y, 2), color: SIMD3<Float>(1, 1, 1)))
+            var y = Float(i)/(Float(numLights) - 1.0) - 0.5
+            y *= height
+            lights.append(PointLight(worldPosition: SIMD3<Float>(-width/2, y, 2), color: SIMD3<Float>(1, 1, 1)))
+            lights.append(PointLight(worldPosition: SIMD3<Float>( width/2, y, 2), color: SIMD3<Float>(1, 1, 1)))
         }
         return lights
     }
